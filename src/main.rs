@@ -15,6 +15,11 @@ use std::time::Duration;
 
 use crossterm::event::KeyEventKind::Press;
 
+const INFO_TEXT: [&str; 2] = [
+    "(Esc) quit | (Ctrl+C) quit | (Ctrl+R) scan for networks ",
+    "(Enter) connect to network | (↑) move up | (↓) move down",
+];
+
 struct WifiNetwork {
     in_use: bool,
     ssid: String,
@@ -77,6 +82,27 @@ impl App {
                 }) => {
                     self.scan_networks();
                 }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Enter,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.connect();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Up,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.update_selected_network(-1);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Down,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.update_selected_network(1);
+                }
                 _ => {}
             };
         }
@@ -120,6 +146,14 @@ impl App {
             })
         });
         self.is_scanning = false;
+    }
+
+    fn connect(&mut self) {
+        todo!("logic to connect to the selected network");
+    }
+
+    fn update_selected_network(&mut self, direction: isize) {
+        todo!("logic to update the selected network based on user input");
     }
 }
 
