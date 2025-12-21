@@ -10,9 +10,25 @@ use ratatui::{
     widgets::{Block, Paragraph, Widget},
 };
 use std::io;
+use std::process::Command;
 use std::time::Duration;
 
 use crossterm::event::KeyEventKind::Press;
+
+struct WifiNetwork {
+    ssid: String,
+    security: String,
+}
+
+impl WifiNetwork {
+    fn new(ssid: &str, security: &str) -> Self {
+        Self {
+            ssid: ssid.to_string(),
+            security: security.to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Default)]
 struct App {
     is_scanning: bool,
@@ -81,13 +97,34 @@ impl App {
 
     fn scan_networks(&mut self) {
         self.is_scanning = true;
-        // Simulate scanning
-        std::thread::sleep(std::time::Duration::from_secs(2));
-        self.wifi_list = vec![
-            "Network_1".to_string(),
-            "Network_2".to_string(),
-            "Network_3".to_string(),
-        ];
+        // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
+        let output = Command::new("nmcli")
+            .arg("-t")
+            .arg("-f")
+            .arg("IN-USE,SSID,SECURITY")
+            .arg("device")
+            .arg("wifi")
+            .arg("list")
+            .output()
+            .expect("Failed to execute nmcli command");
+
+        if !output.status.success() {
+            self.error = String::from("Failed to scan for Wi-Fi networks.");
+            return;
+        }
+
+        let output_str = String::from_utf8_lossy(&output.stdout);
+        let mut networks = Vec::new();
+        for line in output_str.lines() {
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() >= 3 {
+                let in_use = parts[0];
+                let ssid = parts[1];
+                let security = parts[2];
+                let prefix = if in_use == "*" { "[*] " } else { "[ ] " };
+                networks.push(WifiNetwork::new(ssid, security));
+            }
+        }
         self.is_scanning = false;
     }
 }
