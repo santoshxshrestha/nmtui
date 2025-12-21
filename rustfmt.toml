@@ -1,0 +1,7 @@
+reorder_imports = true
+
+fn_params_layout = "Tall"
+
+remove_nested_parens = true
+
+tab_spaces = 4
