@@ -9,7 +9,9 @@ use ratatui::{
     text::Line,
     widgets::{Block, Paragraph, Widget},
 };
+use std::io;
 
+use crossterm::event::KeyEventKind::Press;
 #[derive(Debug, Default)]
 struct App {
     search: bool,
@@ -39,8 +41,23 @@ impl App {
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
     }
-    fn handle_events(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        todo!(" write an event handling logic here ")
+
+    fn handle_events(&mut self) -> io::Result<()> {
+        match event::read()? {
+            Event::Key(KeyEvent {
+                code: KeyCode::Esc,
+                kind: Press,
+                ..
+            }) => {
+                self.exit();
+            }
+            _ => {}
+        };
+        Ok(())
+    }
+
+    fn exit(&mut self) {
+        self.exit = true;
     }
 }
 
