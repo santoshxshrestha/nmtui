@@ -51,6 +51,14 @@ impl App {
             }) => {
                 self.exit();
             }
+            Event::Key(KeyEvent {
+                code: KeyCode::Char('c'),
+                modifiers: KeyModifiers::CONTROL,
+                kind: Press,
+                ..
+            }) => {
+                self.exit();
+            }
             _ => {}
         };
         Ok(())
@@ -61,7 +69,7 @@ impl App {
     }
 }
 
-impl Widget for App {
+impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let block = Block::default()
             .borders(ratatui::widgets::Borders::ALL)
@@ -70,9 +78,26 @@ impl Widget for App {
             .title("NMTUI")
             .title_alignment(ratatui::layout::Alignment::Center);
         block.render(area, buf);
+        let content = Paragraph::new(Line::from(format!("{:#?}", self)));
+        content.render(
+            Rect {
+                x: area.x + 1,
+                y: area.y + 1,
+                width: area.width - 2,
+                height: area.height - 2,
+            },
+            buf,
+        );
     }
 }
 
+pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
+    let mut terminal = ratatui::init();
+    let app_result = App::default().run(&mut terminal);
+    ratatui::try_restore();
+    app_result
+}
+
 fn main() {
-    println!("Hello, world!");
+    tui().unwrap()
 }
