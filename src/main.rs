@@ -16,17 +16,9 @@ use std::time::Duration;
 use crossterm::event::KeyEventKind::Press;
 
 struct WifiNetwork {
+    in_use: bool,
     ssid: String,
     security: String,
-}
-
-impl WifiNetwork {
-    fn new(ssid: &str, security: &str) -> Self {
-        Self {
-            ssid: ssid.to_string(),
-            security: security.to_string(),
-        }
-    }
 }
 
 #[derive(Debug, Default)]
@@ -112,19 +104,21 @@ impl App {
             self.error = String::from("Failed to scan for Wi-Fi networks.");
             return;
         }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let mut networks: Vec<WifiNetwork> = Vec::new();
 
-        let output_str = String::from_utf8_lossy(&output.stdout);
-        let mut networks = Vec::new();
-        for line in output_str.lines() {
-            let parts: Vec<&str> = line.split(':').collect();
-            if parts.len() >= 3 {
-                let in_use = parts[0];
-                let ssid = parts[1];
-                let security = parts[2];
-                let prefix = if in_use == "*" { "[*] " } else { "[ ] " };
-                networks.push(WifiNetwork::new(ssid, security));
-            }
-        }
+        stdout.lines().map(|line| {
+            let mut parts = line.splitn(3, ':');
+
+            let in_use = parts.next() == Some("*");
+            let ssid = parts.next().unwrap_or("").to_string();
+            let security = parts.next().unwrap_or("--").to_string();
+            networks.push(WifiNetwork {
+                in_use,
+                ssid,
+                security,
+            })
+        });
         self.is_scanning = false;
     }
 }
