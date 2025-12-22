@@ -113,7 +113,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.connect();
+                    self.try_connecting();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Up,
@@ -139,8 +139,21 @@ impl App {
         self.app_state.exit = true;
     }
 
-    fn connect(&mut self) {
-        todo!("logic to connect to the selected network");
+    fn try_connecting(&mut self) {
+        // currently writing a logic just to connect the selected network with out handling the
+        // logic for already connected network
+        match self.wifi_list.try_lock() {
+            Ok(wifi_list) => {
+                if wifi_list[self.selected].in_use {
+                    return;
+                } else {
+                    todo!("Implement connection logic here")
+                }
+            }
+            Err(_) => {
+                panic!("Failed to acquire lock on wifi_list");
+            }
+        }
     }
 
     fn update_selected_network(&mut self, direction: isize) {
