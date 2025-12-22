@@ -129,16 +129,12 @@ impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from("NMTUI").bold().italic().centered();
 
-        let instructions = Line::from("Press ESC or Ctrl+C to exit")
-            .italic()
-            .centered();
-
         let block = Block::default()
             .borders(ratatui::widgets::Borders::ALL)
             .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Blue))
             .border_type(ratatui::widgets::BorderType::Rounded)
             .title(title)
-            .title_bottom(instructions);
+            .title_bottom(Line::from(INFO_TEXT.join(" ")).italic().centered());
 
         let mut header = Vec::new();
         header.push(
