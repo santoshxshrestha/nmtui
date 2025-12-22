@@ -34,6 +34,12 @@ struct WifiNetwork {
 }
 
 #[derive(Debug)]
+struct WifiCredentials {
+    ssid: String,
+    password: String,
+}
+
+#[derive(Debug)]
 struct App {
     ssid: String,
     password: String,
@@ -41,7 +47,7 @@ struct App {
     ip: String,
     error: Arc<Mutex<String>>,
     loading: bool,
-    show_password: bool,
+    show_password_popup: bool,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
@@ -61,7 +67,7 @@ impl Default for App {
             ip: String::new(),
             error: Arc::new(Mutex::new(String::new())),
             loading: false,
-            show_password: false,
+            show_password_popup: false,
             wifi_list: Arc::new(Mutex::new(Vec::new())),
             selected: 0,
             app_state: AppState { exit: false },
@@ -146,8 +152,33 @@ impl App {
             Ok(wifi_list) => {
                 if wifi_list[self.selected].in_use {
                     return;
+                } else if wifi_list[self.selected].security == "--" {
+                    self.ssid = wifi_list[self.selected].ssid.clone();
+                    match connect_to_network(&self.ssid, "") {
+                        Ok(()) => {
+                            self.show_password_popup = false;
+                        }
+                        Err(e) => {
+                            // let mut error_lock = self.error.lock().unwrap();
+                            // *error_lock = format!("Failed to connect: {}", e);
+                            self.show_password_popup = false;
+                            panic!(" Failed to connect: {}", e);
+                        }
+                    }
                 } else {
-                    todo!("Implement connection logic here")
+                    self.ssid = wifi_list[self.selected].ssid.clone();
+                    self.show_password_popup = true;
+                    match connect_to_network(&self.ssid, &self.password) {
+                        Ok(()) => {
+                            self.show_password_popup = false;
+                        }
+                        Err(e) => {
+                            // let mut error_lock = self.error.lock().unwrap();
+                            // *error_lock = format!("Failed to connect: {}", e);
+                            self.show_password_popup = false;
+                            panic!(" Failed to connect: {}", e);
+                        }
+                    }
                 }
             }
             Err(_) => {
@@ -229,6 +260,17 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
     let app_result = App::default().run(&mut terminal);
     ratatui::try_restore();
     app_result
+}
+pub fn connect_to_network(ssid: &str, password: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let status = Command::new("nmcli")
+        .args(&["device", "wifi", "connect", ssid, "password", password])
+        .status()?;
+
+    if status.success() {
+        Ok(())
+    } else {
+        Err("Failed to connect to the network".into())
+    }
 }
 
 fn main() -> Result<()> {
