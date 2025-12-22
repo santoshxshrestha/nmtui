@@ -9,9 +9,11 @@ use ratatui::{
     text::Line,
     widgets::{self, Block, Paragraph, Row, Table, TableState, Widget},
 };
-use std::io;
 use std::process::Command;
+use std::sync::Arc;
+use std::thread;
 use std::time::Duration;
+use std::{io, sync::Mutex};
 
 use crossterm::event::KeyEventKind::Press;
 
@@ -34,10 +36,10 @@ struct App {
     password: String,
     connected: bool,
     ip: String,
-    error: String,
+    error: Arc<Mutex<String>>,
     loading: bool,
     show_password: bool,
-    wifi_list: Vec<WifiNetwork>,
+    wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     exit: bool,
 }
 
@@ -117,64 +119,72 @@ impl App {
     fn scan_networks(&mut self) {
         self.is_scanning = true;
         // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
-        // let output = Command::new("nmcli")
-        //     .arg("-t")
-        //     .arg("-f")
-        //     .arg("IN-USE,SSID,SECURITY")
-        //     .arg("device")
-        //     .arg("wifi")
-        //     .arg("list")
-        //     .output()
-        //     .expect("Failed to execute nmcli command");
-        //
-        // if !output.status.success() {
-        //     self.error = String::from("Failed to scan for Wi-Fi networks.");
-        //     return;
-        // }
-        // let stdout = String::from_utf8_lossy(&output.stdout);
-        // let mut networks: Vec<WifiNetwork> = Vec::new();
-        //
-        // stdout.lines().map(|line| {
-        //     let mut parts = line.splitn(3, ':');
-        //
-        //     let in_use = parts.next() == Some("*");
-        //     let ssid = parts.next().unwrap_or("").to_string();
-        //     let security = parts.next().unwrap_or("--").to_string();
-        //     networks.push(WifiNetwork {
-        //         in_use,
-        //         ssid,
-        //         security,
-        //     })
-        // });
+        // let error = Arc::clone(&self.error);
+        let wifi_list = Arc::clone(&self.wifi_list);
+
+        let handle = thread::spawn(move || {
+            let output = Command::new("nmcli")
+                .arg("-t")
+                .arg("-f")
+                .arg("IN-USE,SSID,SECURITY")
+                .arg("device")
+                .arg("wifi")
+                .arg("list")
+                .output()
+                .expect("Failed to execute nmcli command");
+
+            if !output.status.success() {
+                return;
+            }
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let mut networks: Vec<WifiNetwork> = Vec::new();
+
+            stdout.lines().map(|line| {
+                let mut parts = line.splitn(3, ':');
+
+                let in_use = parts.next() == Some("*");
+                let ssid = parts.next().unwrap_or("").to_string();
+                let security = parts.next().unwrap_or("--").to_string();
+                networks.push(WifiNetwork {
+                    in_use,
+                    ssid,
+                    security,
+                })
+            });
+            let mut wifi_list_lock = wifi_list.lock().unwrap();
+            *wifi_list_lock = networks;
+        });
+
+        handle.join().unwrap();
 
         // temporary hardcoded networks for testing
-        self.wifi_list = vec![
-            WifiNetwork {
-                in_use: false,
-                ssid: "Network_1".to_string(),
-                security: "WPA2".to_string(),
-            },
-            WifiNetwork {
-                in_use: true,
-                ssid: "Network_2".to_string(),
-                security: "WPA3".to_string(),
-            },
-            WifiNetwork {
-                in_use: false,
-                ssid: "Network_3".to_string(),
-                security: "--".to_string(),
-            },
-            WifiNetwork {
-                in_use: false,
-                ssid: "Network_4".to_string(),
-                security: "WEP".to_string(),
-            },
-            WifiNetwork {
-                in_use: false,
-                ssid: "Network_5".to_string(),
-                security: "WPA2".to_string(),
-            },
-        ];
+        // self.wifi_list = vec![
+        //     WifiNetwork {
+        //         in_use: false,
+        //         ssid: "Network_1".to_string(),
+        //         security: "WPA2".to_string(),
+        //     },
+        //     WifiNetwork {
+        //         in_use: true,
+        //         ssid: "Network_2".to_string(),
+        //         security: "WPA3".to_string(),
+        //     },
+        //     WifiNetwork {
+        //         in_use: false,
+        //         ssid: "Network_3".to_string(),
+        //         security: "--".to_string(),
+        //     },
+        //     WifiNetwork {
+        //         in_use: false,
+        //         ssid: "Network_4".to_string(),
+        //         security: "WEP".to_string(),
+        //     },
+        //     WifiNetwork {
+        //         in_use: false,
+        //         ssid: "Network_5".to_string(),
+        //         security: "WPA2".to_string(),
+        //     },
+        // ];
 
         self.is_scanning = false;
     }
@@ -212,7 +222,7 @@ impl Widget for &App {
             ),
         );
 
-        for network in &self.wifi_list {
+        for network in self.wifi_list.lock().unwrap().iter().clone() {
             let sssid = if network.in_use {
                 format!("* {}", network.ssid)
             } else {
