@@ -1,4 +1,5 @@
 #![allow(unused)]
+use color_eyre::eyre::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, poll};
 use ratatui::{
     DefaultTerminal, Frame,
@@ -225,6 +226,8 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
     app_result
 }
 
-fn main() {
-    tui().unwrap()
+fn main() -> Result<()> {
+    color_eyre::install()?;
+    tui().unwrap();
+    Ok(())
 }
