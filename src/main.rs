@@ -41,8 +41,7 @@ struct WifiCredentials {
 
 #[derive(Debug)]
 struct App {
-    ssid: String,
-    password: String,
+    wifi_credentials: WifiCredentials,
     connected: bool,
     ip: String,
     error: Arc<Mutex<String>>,
@@ -61,8 +60,10 @@ struct AppState {
 impl Default for App {
     fn default() -> Self {
         Self {
-            ssid: String::new(),
-            password: String::new(),
+            wifi_credentials: WifiCredentials {
+                ssid: String::new(),
+                password: String::new(),
+            },
             connected: false,
             ip: String::new(),
             error: Arc::new(Mutex::new(String::new())),
@@ -79,6 +80,9 @@ impl App {
     fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<(), Box<dyn std::error::Error>> {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
+            if self.show_password_popup {
+                self.handle_password_input()?;
+            }
             self.handle_events()?;
         }
         Ok(())
@@ -86,6 +90,36 @@ impl App {
 
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
+    }
+    fn handle_password_input(&mut self) -> io::Result<()> {
+        if poll(Duration::from_micros(1))? {
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char(c),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.wifi_credentials.password.push(c);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Backspace,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.wifi_credentials.password.pop();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Enter,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_password_popup = false;
+                    self.try_connecting();
+                }
+                _ => {}
+            };
+        }
+        Ok(())
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -153,8 +187,8 @@ impl App {
                 if wifi_list[self.selected].in_use {
                     return;
                 } else if wifi_list[self.selected].security == "--" {
-                    self.ssid = wifi_list[self.selected].ssid.clone();
-                    match connect_to_network(&self.ssid, "") {
+                    self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
+                    match connect_to_network(&self.wifi_credentials.ssid, "") {
                         Ok(()) => {
                             self.show_password_popup = false;
                         }
@@ -166,9 +200,12 @@ impl App {
                         }
                     }
                 } else {
-                    self.ssid = wifi_list[self.selected].ssid.clone();
+                    self.wifi_credentials.password = wifi_list[self.selected].ssid.clone();
                     self.show_password_popup = true;
-                    match connect_to_network(&self.ssid, &self.password) {
+                    match connect_to_network(
+                        &self.wifi_credentials.ssid,
+                        &self.wifi_credentials.password,
+                    ) {
                         Ok(()) => {
                             self.show_password_popup = false;
                         }
@@ -252,6 +289,27 @@ impl Widget for &App {
         table_state.select(Some(self.selected));
 
         table.render(area, buf);
+
+        if self.show_password_popup {
+            let popup_block = Block::default()
+                .title("Enter Password")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+
+            let popup_area = Rect {
+                x: area.x + area.width / 4,
+                y: area.y + area.height / 4,
+                width: area.width / 2,
+                height: area.height / 4,
+            };
+
+            let password_paragraph = Paragraph::new(self.wifi_credentials.password.as_str())
+                .block(popup_block)
+                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+            password_paragraph.render(popup_area, buf);
+        }
     }
 }
 
