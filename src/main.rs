@@ -33,7 +33,7 @@ struct WifiNetwork {
     security: String,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct App {
     ssid: String,
     password: String,
@@ -43,12 +43,35 @@ struct App {
     loading: bool,
     show_password: bool,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
+    selected: usize,
+    app_state: AppState,
+}
+
+#[derive(Debug)]
+struct AppState {
     exit: bool,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self {
+            ssid: String::new(),
+            password: String::new(),
+            connected: false,
+            ip: String::new(),
+            error: Arc::new(Mutex::new(String::new())),
+            loading: false,
+            show_password: false,
+            wifi_list: Arc::new(Mutex::new(Vec::new())),
+            selected: 0,
+            app_state: AppState { exit: false },
+        }
+    }
 }
 
 impl App {
     fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<(), Box<dyn std::error::Error>> {
-        while !self.exit {
+        while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
         }
@@ -113,7 +136,7 @@ impl App {
     }
 
     fn exit(&mut self) {
-        self.exit = true;
+        self.app_state.exit = true;
     }
 
     fn connect(&mut self) {
@@ -121,7 +144,14 @@ impl App {
     }
 
     fn update_selected_network(&mut self, direction: isize) {
-        todo!("logic to update the selected network based on user input");
+        if let Ok(wifi_list) = self.wifi_list.try_lock() {
+            let len = wifi_list.len();
+            if len > 0 {
+                self.selected =
+                    // Handle wrapping around the list
+                    ((self.selected as isize + direction).rem_euclid(len as isize)) as usize;
+            }
+        }
     }
 }
 
@@ -136,39 +166,46 @@ impl Widget for &App {
             .title(title)
             .title_bottom(Line::from(INFO_TEXT.join(" ")).italic().centered());
 
-        let mut header = Vec::new();
-        header.push(
-            Row::new(vec!["SSID", "SECURITY"]).style(
-                ratatui::style::Style::default()
-                    .fg(ratatui::style::Color::Yellow)
-                    .bold(),
-            ),
+        let header = Row::new(vec!["SSID", "SECURITY"]).style(
+            ratatui::style::Style::default()
+                .fg(ratatui::style::Color::Yellow)
+                .bold(),
         );
+
+        let mut rows = Vec::new();
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
-                for network in wifi_list.iter() {
-                    let sssid = if network.in_use {
+                for (i, network) in wifi_list.iter().enumerate() {
+                    let ssid = if network.in_use {
                         format!("* {}", network.ssid)
                     } else {
                         network.ssid.clone()
                     };
-                    header.push(Row::new(vec![sssid, network.security.clone()]));
+                    let mut row = Row::new(vec![ssid, network.security.clone()]);
+                    if i == self.selected {
+                        row = row.style(
+                            ratatui::style::Style::default()
+                                .fg(ratatui::style::Color::Black)
+                                .bg(ratatui::style::Color::White),
+                        );
+                    }
+                    rows.push(row);
                 }
             }
             Err(_) => {
-                header.push(Row::new(vec!["Scanning...", ""]));
+                rows.push(Row::new(vec!["Scanning...", ""]));
             }
         }
 
-        let widths = [Constraint::Percentage(100), Constraint::Percentage(100)];
+        let widths = [Constraint::Percentage(70), Constraint::Percentage(30)];
 
-        let table = Table::new(header, widths)
-            .widths(widths)
+        let table = Table::new(rows, widths)
+            .header(header)
             .block(block)
             .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
         let mut table_state = TableState::default();
-        *table_state.offset_mut() = 1;
+        table_state.select(Some(self.selected));
 
         table.render(area, buf);
     }
