@@ -203,9 +203,30 @@ impl Widget for &App {
             .title(title)
             .title_bottom(instructions);
 
-        let header = [Row::new(vec!["ssid", "security"])];
-        let widths = [Constraint::Percentage(100), Constraint::Length(100)];
-        let table = Table::new(header, widths).widths(widths).block(block);
+        let mut header = Vec::new();
+        header.push(
+            Row::new(vec!["SSID", "SECURITY"]).style(
+                ratatui::style::Style::default()
+                    .fg(ratatui::style::Color::Yellow)
+                    .bold(),
+            ),
+        );
+
+        for network in &self.wifi_list {
+            let sssid = if network.in_use {
+                format!("* {}", network.ssid)
+            } else {
+                network.ssid.clone()
+            };
+            header.push(Row::new(vec![sssid, network.security.clone()]));
+        }
+
+        let widths = [Constraint::Percentage(100), Constraint::Percentage(100)];
+
+        let table = Table::new(header, widths)
+            .widths(widths)
+            .block(block)
+            .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
         let mut table_state = TableState::default();
         *table_state.offset_mut() = 1;
