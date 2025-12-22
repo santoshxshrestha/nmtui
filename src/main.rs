@@ -262,9 +262,15 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
     app_result
 }
 pub fn connect_to_network(ssid: &str, password: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let status = Command::new("nmcli")
-        .args(&["device", "wifi", "connect", ssid, "password", password])
-        .status()?;
+    let status = if password.is_empty() {
+        Command::new("nmcli")
+            .args(&["dev", "wifi", "connect", ssid])
+            .status()?
+    } else {
+        Command::new("nmcli")
+            .args(&["dev", "wifi", "connect", ssid, "password", password])
+            .status()?
+    };
 
     if status.success() {
         Ok(())
