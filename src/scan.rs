@@ -6,6 +6,7 @@ use std::thread;
 pub fn scan_networks(mut wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
+        let mut wifi_list_lock = wifi_list.lock().unwrap();
         let output = Command::new("nmcli")
             .arg("-t")
             .arg("-f")
@@ -22,7 +23,7 @@ pub fn scan_networks(mut wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let mut networks: Vec<WifiNetwork> = Vec::new();
 
-        stdout.lines().map(|line| {
+        for line in stdout.lines() {
             let mut parts = line.splitn(3, ':');
 
             let in_use = parts.next() == Some("*");
@@ -33,8 +34,7 @@ pub fn scan_networks(mut wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
                 ssid,
                 security,
             })
-        });
-        let mut wifi_list_lock = wifi_list.lock().unwrap();
+        }
         *wifi_list_lock = networks;
     });
 }
