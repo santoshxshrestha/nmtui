@@ -3,11 +3,11 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifier
 use ratatui::{
     DefaultTerminal, Frame,
     buffer::Buffer,
-    layout::Rect,
+    layout::{Constraint, Rect, Rows},
     style::Stylize,
-    symbols::border,
+    symbols::{block, border},
     text::Line,
-    widgets::{Block, Paragraph, Widget},
+    widgets::{self, Block, Paragraph, Row, Table, TableState, Widget},
 };
 use std::io;
 use std::process::Command;
@@ -20,6 +20,7 @@ const INFO_TEXT: [&str; 2] = [
     "(Enter) connect to network | (↑) move up | (↓) move down",
 ];
 
+#[derive(Debug)]
 struct WifiNetwork {
     in_use: bool,
     ssid: String,
@@ -36,7 +37,7 @@ struct App {
     error: String,
     loading: bool,
     show_password: bool,
-    wifi_list: Vec<String>,
+    wifi_list: Vec<WifiNetwork>,
     exit: bool,
 }
 
@@ -115,36 +116,66 @@ impl App {
 
     fn scan_networks(&mut self) {
         self.is_scanning = true;
-        // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
-        let output = Command::new("nmcli")
-            .arg("-t")
-            .arg("-f")
-            .arg("IN-USE,SSID,SECURITY")
-            .arg("device")
-            .arg("wifi")
-            .arg("list")
-            .output()
-            .expect("Failed to execute nmcli command");
+        // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
+        // let output = Command::new("nmcli")
+        //     .arg("-t")
+        //     .arg("-f")
+        //     .arg("IN-USE,SSID,SECURITY")
+        //     .arg("device")
+        //     .arg("wifi")
+        //     .arg("list")
+        //     .output()
+        //     .expect("Failed to execute nmcli command");
+        //
+        // if !output.status.success() {
+        //     self.error = String::from("Failed to scan for Wi-Fi networks.");
+        //     return;
+        // }
+        // let stdout = String::from_utf8_lossy(&output.stdout);
+        // let mut networks: Vec<WifiNetwork> = Vec::new();
+        //
+        // stdout.lines().map(|line| {
+        //     let mut parts = line.splitn(3, ':');
+        //
+        //     let in_use = parts.next() == Some("*");
+        //     let ssid = parts.next().unwrap_or("").to_string();
+        //     let security = parts.next().unwrap_or("--").to_string();
+        //     networks.push(WifiNetwork {
+        //         in_use,
+        //         ssid,
+        //         security,
+        //     })
+        // });
 
-        if !output.status.success() {
-            self.error = String::from("Failed to scan for Wi-Fi networks.");
-            return;
-        }
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let mut networks: Vec<WifiNetwork> = Vec::new();
+        // temporary hardcoded networks for testing
+        self.wifi_list = vec![
+            WifiNetwork {
+                in_use: false,
+                ssid: "Network_1".to_string(),
+                security: "WPA2".to_string(),
+            },
+            WifiNetwork {
+                in_use: true,
+                ssid: "Network_2".to_string(),
+                security: "WPA3".to_string(),
+            },
+            WifiNetwork {
+                in_use: false,
+                ssid: "Network_3".to_string(),
+                security: "--".to_string(),
+            },
+            WifiNetwork {
+                in_use: false,
+                ssid: "Network_4".to_string(),
+                security: "WEP".to_string(),
+            },
+            WifiNetwork {
+                in_use: false,
+                ssid: "Network_5".to_string(),
+                security: "WPA2".to_string(),
+            },
+        ];
 
-        stdout.lines().map(|line| {
-            let mut parts = line.splitn(3, ':');
-
-            let in_use = parts.next() == Some("*");
-            let ssid = parts.next().unwrap_or("").to_string();
-            let security = parts.next().unwrap_or("--").to_string();
-            networks.push(WifiNetwork {
-                in_use,
-                ssid,
-                security,
-            })
-        });
         self.is_scanning = false;
     }
 
@@ -171,25 +202,34 @@ impl Widget for &App {
             .border_type(ratatui::widgets::BorderType::Rounded)
             .title(title)
             .title_bottom(instructions);
-        block.render(area, buf);
 
-        let content_area = Rect {
-            x: area.x + 1,
-            y: area.y + 2,
-            width: area.width - 2,
-            height: area.height - 3,
-        };
+        let header = [Row::new(vec!["ssid", "security"])];
+        let widths = [Constraint::Percentage(100), Constraint::Length(100)];
+        let table = Table::new(header, widths).widths(widths).block(block);
 
-        let content = if self.is_scanning {
-            "Scanning for networks...".to_string()
-        } else if !self.wifi_list.is_empty() {
-            format!("Available Networks:\n{}", self.wifi_list.join("\n"))
-        } else {
-            "No networks found. Press Ctrl+R to scan.".to_string()
-        };
+        let mut table_state = TableState::default();
+        *table_state.offset_mut() = 1;
 
-        let content_paragraph = Paragraph::new(Line::from(content));
-        content_paragraph.render(content_area, buf);
+        table.render(area, buf);
+
+        //
+        // let content_area = Rect {
+        //     x: area.x + 1,
+        //     y: area.y + 2,
+        //     width: area.width - 2,
+        //     height: area.height - 3,
+        // };
+
+        // let content = if self.is_scanning {
+        //     "Scanning for networks...".to_string()
+        // } else if !self.wifi_list.is_empty() {
+        //     format!("Available Networks:\n{}", self.wifi_list.join("\n"))
+        // } else {
+        //     "No networks found. Press Ctrl+R to scan.".to_string()
+        // };
+        //
+        // let content_paragraph = Paragraph::new(Line::from(content));
+        // content_paragraph.render(content_area, buf);
 
         // let content = Paragraph::new(Line::from(format!("{:#?}", self)));
         // content.render(
