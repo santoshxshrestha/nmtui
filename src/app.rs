@@ -214,38 +214,10 @@ impl App {
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
-                    // no need to set this thing to false as its already false
-                    // self.show_password_popup = false;
-
-                    // match connect_to_network(&self.wifi_credentials.ssid, "") {
-                    //     Ok(()) => {
-                    //         self.show_password_popup = false;
-                    //     }
-                    //     Err(e) => {
-                    //         // let mut error_lock = self.error.lock().unwrap();
-                    //         // *error_lock = format!("Failed to connect: {}", e);
-                    //         self.show_password_popup = false;
-                    //         panic!(" Failed to connect: {}", e);
-                    //     }
-                    // }
                 } else {
                     self.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
-                    // match connect_to_network(
-                    //     &self.wifi_credentials.ssid,
-                    //     &self.wifi_credentials.password,
-                    // ) {
-                    //     Ok(()) => {
-                    //         self.show_password_popup = false;
-                    //     }
-                    //     Err(e) => {
-                    //         // let mut error_lock = self.error.lock().unwrap();
-                    //         // *error_lock = format!("Failed to connect: {}", e);
-                    //         self.show_password_popup = false;
-                    //         panic!(" Failed to connect: {}", e);
-                    //     }
-                    // }
                 }
             }
             Err(_) => {
