@@ -3,6 +3,7 @@ use crate::AppState;
 use crate::WifiCredentials;
 use crate::WifiNetwork;
 use crate::connect_to_network;
+use crate::scan;
 use crate::scan_networks;
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, poll};
@@ -39,6 +40,8 @@ pub struct App {
 
 impl Default for App {
     fn default() -> Self {
+        let wifi_list = Arc::new(Mutex::new(Vec::new()));
+        scan_networks(wifi_list.clone());
         Self {
             wifi_credentials: WifiCredentials {
                 ssid: String::new(),
@@ -49,7 +52,7 @@ impl Default for App {
             error: Arc::new(Mutex::new(String::new())),
             loading: false,
             show_password_popup: false,
-            wifi_list: Arc::new(Mutex::new(Vec::new())),
+            wifi_list: wifi_list,
             selected: 0,
             app_state: AppState { exit: false },
         }
