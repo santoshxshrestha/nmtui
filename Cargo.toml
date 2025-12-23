@@ -2,6 +2,13 @@
 name = "nmtui"
 version = "0.1.0"
 edition = "2024"
+authors = ["Santosh Shrestha <santoshxshrestha@gmail.com>"]
+description = "Wrapper around nmcli"
+license = "MIT"
+repository = "https://github.com/santoshxshrestha/nmtui"
+homepage = "https://github.com/santoshxshrestha/nmtui"
+keywords = ["terminal", "nmcli", "tui", "rust"]
+readme = "README.md"
 
 [dependencies]
 color-eyre = "0.6.5"
