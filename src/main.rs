@@ -82,8 +82,9 @@ impl App {
             terminal.draw(|frame| self.draw(frame))?;
             if self.show_password_popup {
                 self.handle_password_input()?;
+            } else {
+                self.handle_events()?;
             }
-            self.handle_events()?;
         }
         Ok(())
     }
@@ -94,6 +95,22 @@ impl App {
     fn handle_password_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_password_popup = false;
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.exit();
+                }
+
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
                     kind: Press,
