@@ -200,8 +200,8 @@ impl App {
                         }
                     }
                 } else {
-                    self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.show_password_popup = true;
+                    self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     match connect_to_network(
                         &self.wifi_credentials.ssid,
                         &self.wifi_credentials.password,
