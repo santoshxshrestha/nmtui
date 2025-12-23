@@ -208,8 +208,6 @@ impl App {
     }
 
     fn prepare_to_connect(&mut self) {
-        // currently writing a logic just to connect the selected network with out handling the
-        // logic for already connected network
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
                 if wifi_list[self.selected].in_use {
