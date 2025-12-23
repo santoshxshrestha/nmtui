@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::AppState;
 use crate::WifiCredentials;
 use crate::WifiNetwork;

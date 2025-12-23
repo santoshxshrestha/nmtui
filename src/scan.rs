@@ -3,7 +3,7 @@ use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-pub fn scan_networks(mut wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
+pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
         let mut wifi_list_lock = wifi_list.lock().unwrap();
