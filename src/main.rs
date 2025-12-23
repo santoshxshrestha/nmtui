@@ -176,14 +176,14 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.try_connecting();
+                    self.prepare_to_connect();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('o'),
                     kind: Press,
                     ..
                 }) => {
-                    self.try_connecting();
+                    self.prepare_to_connect();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Up,
@@ -224,7 +224,7 @@ impl App {
         self.app_state.exit = true;
     }
 
-    fn try_connecting(&mut self) {
+    fn prepare_to_connect(&mut self) {
         // currently writing a logic just to connect the selected network with out handling the
         // logic for already connected network
         match self.wifi_list.try_lock() {
