@@ -18,6 +18,7 @@ struct WifiNetwork {
 struct WifiCredentials {
     ssid: String,
     password: String,
+    cursor_pos: u16,
 }
 
 #[derive(Debug)]
