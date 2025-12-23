@@ -22,7 +22,7 @@ use std::time::Duration;
 
 const INFO_TEXT: [&str; 2] = [
     "(Esc) quit | (Ctrl+C) quit | (Ctrl+R) scan for networks ",
-    "(Enter) connect to network | (↑) move up | (↓) move down",
+    "(Enter|o) connect to network | (↑|k) move up | (↓|j) move down",
 ];
 
 #[derive(Debug)]
