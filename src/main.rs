@@ -173,6 +173,13 @@ impl App {
                     self.try_connecting();
                 }
                 Event::Key(KeyEvent {
+                    code: KeyCode::Char('o'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.try_connecting();
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Up,
                     kind: Press,
                     ..
