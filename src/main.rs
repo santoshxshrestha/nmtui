@@ -19,7 +19,10 @@ use std::{process::Command, sync::atomic};
 
 use crossterm::event::KeyEventKind::Press;
 mod scan;
+mod utils;
 use scan::scan_networks;
+use utils::connect_to_network;
+use utils::tui;
 
 const INFO_TEXT: [&str; 2] = [
     "(Esc) quit | (Ctrl+C) quit | (Ctrl+R) scan for networks ",
@@ -357,30 +360,6 @@ impl Widget for &App {
 
             password_paragraph.render(popup_area, buf);
         }
-    }
-}
-
-pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
-    let mut terminal = ratatui::init();
-    let app_result = App::default().run(&mut terminal);
-    ratatui::try_restore();
-    app_result
-}
-pub fn connect_to_network(ssid: &str, password: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let status = if password.is_empty() {
-        Command::new("nmcli")
-            .args(&["dev", "wifi", "connect", ssid])
-            .status()?
-    } else {
-        Command::new("nmcli")
-            .args(&["dev", "wifi", "connect", ssid, "password", password])
-            .status()?
-    };
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err("Failed to connect to the network".into())
     }
 }
 
