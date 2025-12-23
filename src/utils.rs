@@ -1,4 +1,4 @@
-use crate::App;
+use crate::app::App;
 use std::process::Command;
 
 pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
