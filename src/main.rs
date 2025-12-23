@@ -186,6 +186,21 @@ impl App {
                 }) => {
                     self.update_selected_network(1);
                 }
+                // vim style
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('k'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.update_selected_network(-1);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('j'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.update_selected_network(1);
+                }
                 _ => {}
             };
         }
