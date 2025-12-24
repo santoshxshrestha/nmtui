@@ -12,33 +12,26 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
 pub fn connect_to_network(
     wifi_creadentials: &WifiCredentials,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let status = if wifi_creadentials.password.is_empty() {
+    let WifiCredentials {
+        is_hidden,
+        ssid,
+        password,
+        ..
+    } = wifi_creadentials;
+
+    let status = if password.is_empty() {
         Command::new("nmcli")
             .args(&["dev", "wifi", "connect", &wifi_creadentials.ssid])
             .status()?
-    } else if wifi_creadentials.is_hidden == true {
+    } else if *is_hidden == true {
         Command::new("nmcli")
             .args(&[
-                "dev",
-                "wifi",
-                "connect",
-                &wifi_creadentials.ssid,
-                "password",
-                &wifi_creadentials.password,
-                "hidden",
-                "yes",
+                "dev", "wifi", "connect", ssid, "password", password, "hidden", "yes",
             ])
             .status()?
     } else {
         Command::new("nmcli")
-            .args(&[
-                "dev",
-                "wifi",
-                "connect",
-                &wifi_creadentials.ssid,
-                "password",
-                &wifi_creadentials.password,
-            ])
+            .args(&["dev", "wifi", "connect", ssid, "password", password])
             .status()?
     };
 
