@@ -35,6 +35,11 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
                 security,
             })
         }
+        networks.push(WifiNetwork {
+            in_use: false,
+            ssid: "Connect to Hidden network".to_string(),
+            security: "?".to_string(),
+        });
         *wifi_list_lock = networks;
     });
 }

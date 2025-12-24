@@ -37,6 +37,7 @@ pub struct App {
     error: Arc<Mutex<String>>,
     loading: bool,
     show_password_popup: bool,
+    show_ssid_popup: bool,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
@@ -48,6 +49,7 @@ impl Default for App {
         scan_networks(wifi_list.clone());
         Self {
             wifi_credentials: WifiCredentials {
+                is_hidden: false,
                 ssid: String::new(),
                 password: String::new(),
                 cursor_pos: 0,
@@ -57,6 +59,7 @@ impl Default for App {
             error: Arc::new(Mutex::new(String::new())),
             loading: false,
             show_password_popup: false,
+            show_ssid_popup: false,
             wifi_list: wifi_list,
             selected: 0,
             app_state: AppState { exit: false },
@@ -71,7 +74,9 @@ impl App {
     ) -> Result<(), Box<dyn std::error::Error>> {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
-            if self.show_password_popup {
+            if self.show_ssid_popup {
+                self.handle_ssid_input()?;
+            } else if self.show_password_popup {
                 self.handle_password_input()?;
             } else {
                 self.handle_events()?;
@@ -82,6 +87,56 @@ impl App {
 
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
+    }
+
+    fn handle_ssid_input(&mut self) -> io::Result<()> {
+        if poll(Duration::from_micros(1))? {
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_ssid_popup = false;
+                    self.show_password_popup = false;
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.exit();
+                }
+
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char(c),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.wifi_credentials.ssid.push(c);
+                    self.wifi_credentials.cursor_pos += 1;
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Backspace,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.wifi_credentials.ssid.pop();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Enter,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_ssid_popup = false;
+                    self.show_password_popup = true;
+                    self.wifi_credentials.cursor_pos = 0;
+                }
+                _ => {}
+            };
+        }
+        Ok(())
     }
     fn handle_password_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
@@ -123,10 +178,7 @@ impl App {
                     ..
                 }) => {
                     self.show_password_popup = false;
-                    connect_to_network(
-                        &self.wifi_credentials.ssid,
-                        &self.wifi_credentials.password,
-                    );
+                    connect_to_network(&self.wifi_credentials);
                 }
                 _ => {}
             };
@@ -221,6 +273,16 @@ impl App {
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
+                } else if wifi_list[self.selected].ssid == "Connect to Hidden network" {
+                    self.wifi_credentials.is_hidden = true;
+                    self.show_ssid_popup = true;
+
+                    // if the wifi is hidden, then the ssid should be entered manually and the
+                    // passoword popupo should be shown by the listner of the enter of the in the
+                    // ssid input
+                    self.show_password_popup = false;
+                    self.wifi_credentials.ssid.clear();
+                    self.wifi_credentials.password.clear();
                 } else {
                     self.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
@@ -299,12 +361,45 @@ impl Widget for &App {
 
         table.render(area, buf);
 
+        // handle the render of the ssid input popup for hidden networks
+        if self.wifi_credentials.is_hidden {
+            let popup_block = Block::default()
+                .title("Enter the ssid of the hidden network")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+
+            let popup_area = Rect {
+                x: area.x + area.width / 4,
+                y: area.y + area.height / 4,
+                width: area.width / 2,
+                height: area.height / 4,
+            };
+
+            let ssid_paragraph = Paragraph::new(self.wifi_credentials.ssid.as_str())
+                .block(popup_block)
+                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+            let _ = execute!(
+                io::stdout(),
+                cursor::Show,
+                MoveTo(
+                    popup_area.x + self.wifi_credentials.cursor_pos + 1,
+                    popup_area.y + 1,
+                ),
+                EnableBlinking
+            );
+
+            ssid_paragraph.render(popup_area, buf);
+        }
+
         if self.show_password_popup {
             let popup_block = Block::default()
                 .title("Enter Password")
                 .borders(ratatui::widgets::Borders::ALL)
                 .border_type(ratatui::widgets::BorderType::Rounded)
-                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta))
+                .title_bottom("If the network is open | already saved, just press Enter");
 
             let popup_area = Rect {
                 x: area.x + area.width / 4,
