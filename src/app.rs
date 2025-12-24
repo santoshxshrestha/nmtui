@@ -401,7 +401,8 @@ impl Widget for &App {
                 .title("Enter Password")
                 .borders(ratatui::widgets::Borders::ALL)
                 .border_type(ratatui::widgets::BorderType::Rounded)
-                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta))
+                .title_bottom("If the network is open, just press Enter");
 
             let popup_area = Rect {
                 x: area.x + area.width / 4,
