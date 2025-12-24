@@ -178,10 +178,7 @@ impl App {
                     ..
                 }) => {
                     self.show_password_popup = false;
-                    connect_to_network(
-                        &self.wifi_credentials.ssid,
-                        &self.wifi_credentials.password,
-                    );
+                    connect_to_network(&self.wifi_credentials);
                 }
                 _ => {}
             };
