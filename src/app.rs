@@ -11,6 +11,7 @@ use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, poll};
 use crossterm::execute;
+use ratatui::widgets::Clear;
 use ratatui::{
     DefaultTerminal, Frame,
     buffer::Buffer,
@@ -363,6 +364,7 @@ impl Widget for &App {
 
         // handle the render of the ssid input popup for hidden networks
         if self.wifi_credentials.is_hidden {
+            Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter the ssid of the hidden network")
                 .borders(ratatui::widgets::Borders::ALL)
@@ -394,6 +396,7 @@ impl Widget for &App {
         }
 
         if self.show_password_popup {
+            Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter Password")
                 .borders(ratatui::widgets::Borders::ALL)
