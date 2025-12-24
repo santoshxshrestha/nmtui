@@ -5,6 +5,7 @@ use crate::WifiNetwork;
 use crate::connect_to_network;
 use crate::scan;
 use crate::scan_networks;
+use crossterm::ExecutableCommand;
 use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, poll};
@@ -314,14 +315,10 @@ impl Widget for &App {
             let password_paragraph = Paragraph::new(self.wifi_credentials.password.as_str())
                 .block(popup_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
-
-            execute!(
-                io::stdout(),
-                MoveTo(
-                    popup_area.x + 1 + self.wifi_credentials.cursor_pos,
-                    popup_area.y + 1
-                )
-            );
+            io::stdout().execute(MoveTo(
+                popup_area.x + self.wifi_credentials.cursor_pos + 1,
+                popup_area.y + 1,
+            ));
 
             password_paragraph.render(popup_area, buf);
         }
