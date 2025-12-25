@@ -115,16 +115,20 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
+                    // TODO: change the logic to insert the content in the current curser position
+                    // by giving the user to move the cursor to the left and right if they have done some mistake
                     self.wifi_credentials.ssid.push(c);
-                    self.wifi_credentials.cursor_pos += 1;
+                    self.move_cursor_right();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
                     kind: Press,
                     ..
                 }) => {
+                    // TODO: change the logic to delete the content in the current curser position
+                    // by giving the user to move the cursor to the left and right if they have done some mistake
                     self.wifi_credentials.ssid.pop();
-                    self.wifi_credentials.cursor_pos -= 1;
+                    self.move_cursor_left();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -133,7 +137,7 @@ impl App {
                 }) => {
                     self.show_ssid_popup = false;
                     self.show_password_popup = true;
-                    self.wifi_credentials.cursor_pos = 0;
+                    self.reset_cursor_position();
                 }
                 _ => {}
             };
@@ -164,16 +168,20 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
+                    // TODO: change the logic to insert the content in the current curser position
+                    // by giving the user to move the cursor to the left and right if they have done some mistake
                     self.wifi_credentials.password.push(c);
-                    self.wifi_credentials.cursor_pos += 1;
+                    self.move_cursor_right();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
                     kind: Press,
                     ..
                 }) => {
+                    // TODO: change the logic to pop the content in the current curser position
+                    // by giving the user to move the cursor to the left and right if they have done some mistake
                     self.wifi_credentials.password.pop();
-                    self.wifi_credentials.cursor_pos -= 1;
+                    self.move_cursor_left()
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -182,6 +190,7 @@ impl App {
                 }) => {
                     self.show_password_popup = false;
                     connect_to_network(&self.wifi_credentials);
+                    self.reset_cursor_position();
                 }
                 _ => {}
             };
@@ -307,6 +316,16 @@ impl App {
                     ((self.selected as isize + direction).rem_euclid(len as isize)) as usize;
             }
         }
+    }
+    fn move_cursor_left(&mut self) {
+        self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_sub(1);
+    }
+
+    fn move_cursor_right(&mut self) {
+        self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_add(1);
+    }
+    fn reset_cursor_position(&mut self) {
+        self.wifi_credentials.cursor_pos = 0;
     }
 }
 
