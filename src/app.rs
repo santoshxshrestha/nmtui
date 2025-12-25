@@ -350,6 +350,8 @@ impl App {
     }
 
     fn move_cursor_right(&mut self) {
+        // Todo: this will move the cursor to the right and beyound the lenght of the string so need to handle that after
+        // doing some indexing in the string of the ssid and password
         self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_add(1);
     }
     fn reset_cursor_position(&mut self) {
