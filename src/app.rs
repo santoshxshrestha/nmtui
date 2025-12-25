@@ -94,6 +94,20 @@ impl App {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
+                    code: KeyCode::Left,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_left();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Right,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_right();
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
                     ..
@@ -115,20 +129,16 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    // TODO: change the logic to insert the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.ssid.push(c);
-                    self.move_cursor_right();
+                    //enter_char handles the cursor position internally
+                    self.enter_char(c);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
                     kind: Press,
                     ..
                 }) => {
-                    // TODO: change the logic to delete the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.ssid.pop();
-                    self.move_cursor_left();
+                    // delete_char handles the cursor position internally
+                    self.delete_char();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -147,6 +157,20 @@ impl App {
     fn handle_password_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Left,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_left();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Right,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_right();
+                }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
@@ -317,11 +341,54 @@ impl App {
             }
         }
     }
+
+    // getting the byte index of the cursor position in the string(utf-8)
+    fn byte_index(&self) -> usize {
+        self.wifi_credentials
+            .ssid
+            .char_indices()
+            .map(|(i, _)| i)
+            .nth(self.wifi_credentials.cursor_pos as usize)
+            .unwrap_or(self.wifi_credentials.ssid.len())
+    }
+
+    fn enter_char(&mut self, c: char) {
+        let index = self.byte_index();
+        self.wifi_credentials.ssid.insert(index, c);
+        self.move_cursor_right();
+    }
+
+    // Todo: need to refactore this function with the acutal data type
+    // here we are doing like this because removing a char from a string in rust is not straightforward
+    fn delete_char(&mut self) {
+        let cursor_pos = self.wifi_credentials.cursor_pos;
+        if cursor_pos > 0 {
+            let char_index_to_delete = cursor_pos as usize - 1;
+            // getting all the chars before the char to delete
+            let before_char_to_delete = self
+                .wifi_credentials
+                .ssid
+                .chars()
+                .take(char_index_to_delete);
+
+            // getting all the chars after the car to delete
+            let after_char_to_delete = self.wifi_credentials.ssid.chars().skip(cursor_pos as usize);
+
+            self.wifi_credentials.ssid =
+                before_char_to_delete.chain(after_char_to_delete).collect();
+
+            // we are deleting the char to we need to more the cursor to the left
+            self.move_cursor_left();
+        }
+    }
+
     fn move_cursor_left(&mut self) {
         self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_sub(1);
     }
 
     fn move_cursor_right(&mut self) {
+        // Todo: this will move the cursor to the right and beyound the lenght of the string so need to handle that after
+        // doing some indexing in the string of the ssid and password
         self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_add(1);
     }
     fn reset_cursor_position(&mut self) {
