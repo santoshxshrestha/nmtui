@@ -94,6 +94,20 @@ impl App {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
+                    code: KeyCode::Left,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_left();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Right,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_right();
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
                     ..
@@ -147,6 +161,20 @@ impl App {
     fn handle_password_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Left,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_left();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Right,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.move_cursor_right();
+                }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
