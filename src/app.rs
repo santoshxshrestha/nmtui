@@ -124,6 +124,7 @@ impl App {
                     ..
                 }) => {
                     self.wifi_credentials.ssid.pop();
+                    self.wifi_credentials.cursor_pos -= 1;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -172,6 +173,7 @@ impl App {
                     ..
                 }) => {
                     self.wifi_credentials.password.pop();
+                    self.wifi_credentials.cursor_pos -= 1;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
