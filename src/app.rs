@@ -129,20 +129,16 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    // TODO: change the logic to insert the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.ssid.push(c);
-                    self.move_cursor_right();
+                    //enter_char handles the cursor position internally
+                    self.enter_char(c);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
                     kind: Press,
                     ..
                 }) => {
-                    // TODO: change the logic to delete the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.ssid.pop();
-                    self.move_cursor_left();
+                    // delete_char handles the cursor position internally
+                    self.delete_char();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -367,12 +363,13 @@ impl App {
     fn delete_char(&mut self) {
         let cursor_pos = self.wifi_credentials.cursor_pos;
         if cursor_pos > 0 {
-            let char_index = cursor_pos as usize - 1;
-            self.wifi_credentials.ssid.remove(char_index as usize);
-            self.move_cursor_left();
-
+            let char_index_to_delete = cursor_pos as usize - 1;
             // getting all the chars before the char to delete
-            let before_char_to_delete = self.wifi_credentials.ssid.chars().take(char_index);
+            let before_char_to_delete = self
+                .wifi_credentials
+                .ssid
+                .chars()
+                .take(char_index_to_delete);
 
             // getting all the chars after the car to delete
             let after_char_to_delete = self.wifi_credentials.ssid.chars().skip(cursor_pos as usize);
