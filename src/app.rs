@@ -49,12 +49,7 @@ impl Default for App {
         let wifi_list = Arc::new(Mutex::new(Vec::new()));
         scan_networks(wifi_list.clone());
         Self {
-            wifi_credentials: WifiCredentials {
-                is_hidden: false,
-                ssid: String::new(),
-                password: String::new(),
-                cursor_pos: 0,
-            },
+            wifi_credentials: WifiCredentials::default(),
             connected: false,
             ip: String::new(),
             error: Arc::new(Mutex::new(String::new())),
@@ -63,7 +58,7 @@ impl Default for App {
             show_ssid_popup: false,
             wifi_list: wifi_list,
             selected: 0,
-            app_state: AppState { exit: false },
+            app_state: AppState::default(),
         }
     }
 }
