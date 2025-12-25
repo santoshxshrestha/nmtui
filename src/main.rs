@@ -6,6 +6,8 @@ mod utils;
 use scan::scan_networks;
 use utils::connect_to_network;
 use utils::tui;
+mod creadentials;
+use creadentials::WifiCredentials;
 
 #[derive(Debug)]
 struct WifiNetwork {
@@ -15,16 +17,13 @@ struct WifiNetwork {
 }
 
 #[derive(Debug)]
-struct WifiCredentials {
-    is_hidden: bool,
-    ssid: String,
-    password: String,
-    cursor_pos: u16,
-}
-
-#[derive(Debug)]
 struct AppState {
     exit: bool,
+}
+impl Default for AppState {
+    fn default() -> Self {
+        AppState { exit: false }
+    }
 }
 
 fn main() -> Result<()> {
