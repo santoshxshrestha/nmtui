@@ -37,8 +37,6 @@ pub struct App {
     ip: String,
     error: Arc<Mutex<String>>,
     loading: bool,
-    show_password_popup: bool,
-    show_ssid_popup: bool,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
@@ -54,8 +52,6 @@ impl Default for App {
             ip: String::new(),
             error: Arc::new(Mutex::new(String::new())),
             loading: false,
-            show_password_popup: false,
-            show_ssid_popup: false,
             wifi_list: wifi_list,
             selected: 0,
             app_state: AppState::default(),
@@ -70,10 +66,10 @@ impl App {
     ) -> Result<(), Box<dyn std::error::Error>> {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
-            if self.show_ssid_popup {
-                self.handle_ssid_input()?;
-            } else if self.show_password_popup {
-                self.handle_password_input()?;
+            if self.wifi_credentials.show_ssid_popup {
+                self.wifi_credentials.handle_ssid_input()?;
+            } else if self.wifi_credentials.show_password_popup {
+                self.wifi_credentials.handle_password_input()?;
             } else {
                 self.handle_events()?;
             }
@@ -83,138 +79,6 @@ impl App {
 
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
-    }
-
-    fn handle_ssid_input(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Left,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.move_cursor_left();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Right,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.move_cursor_right();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.show_ssid_popup = false;
-                    self.show_password_popup = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.exit();
-                }
-
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char(c),
-                    kind: Press,
-                    ..
-                }) => {
-                    //enter_char handles the cursor position internally
-                    self.enter_char(c);
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Backspace,
-                    kind: Press,
-                    ..
-                }) => {
-                    // delete_char handles the cursor position internally
-                    self.delete_char();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.show_ssid_popup = false;
-                    self.show_password_popup = true;
-                    self.reset_cursor_position();
-                }
-                _ => {}
-            };
-        }
-        Ok(())
-    }
-    fn handle_password_input(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Left,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.move_cursor_left();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Right,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.move_cursor_right();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.show_password_popup = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.exit();
-                }
-
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char(c),
-                    kind: Press,
-                    ..
-                }) => {
-                    // TODO: change the logic to insert the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.password.push(c);
-                    self.move_cursor_right();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Backspace,
-                    kind: Press,
-                    ..
-                }) => {
-                    // TODO: change the logic to pop the content in the current curser position
-                    // by giving the user to move the cursor to the left and right if they have done some mistake
-                    self.wifi_credentials.password.pop();
-                    self.move_cursor_left()
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.show_password_popup = false;
-                    connect_to_network(&self.wifi_credentials);
-                    self.reset_cursor_position();
-                }
-                _ => {}
-            };
-        }
-        Ok(())
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -306,16 +170,16 @@ impl App {
                     self.wifi_credentials.password.clear();
                 } else if wifi_list[self.selected].ssid == "Connect to Hidden network" {
                     self.wifi_credentials.is_hidden = true;
-                    self.show_ssid_popup = true;
+                    self.wifi_credentials.show_ssid_popup = true;
 
                     // if the wifi is hidden, then the ssid should be entered manually and the
                     // passoword popupo should be shown by the listner of the enter of the in the
                     // ssid input
-                    self.show_password_popup = false;
+                    self.wifi_credentials.show_password_popup = false;
                     self.wifi_credentials.ssid.clear();
                     self.wifi_credentials.password.clear();
                 } else {
-                    self.show_password_popup = true;
+                    self.wifi_credentials.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
                 }
@@ -335,59 +199,6 @@ impl App {
                     ((self.selected as isize + direction).rem_euclid(len as isize)) as usize;
             }
         }
-    }
-
-    // getting the byte index of the cursor position in the string(utf-8)
-    fn byte_index(&self) -> usize {
-        self.wifi_credentials
-            .ssid
-            .char_indices()
-            .map(|(i, _)| i)
-            .nth(self.wifi_credentials.cursor_pos as usize)
-            .unwrap_or(self.wifi_credentials.ssid.len())
-    }
-
-    fn enter_char(&mut self, c: char) {
-        let index = self.byte_index();
-        self.wifi_credentials.ssid.insert(index, c);
-        self.move_cursor_right();
-    }
-
-    // Todo: need to refactore this function with the acutal data type
-    // here we are doing like this because removing a char from a string in rust is not straightforward
-    fn delete_char(&mut self) {
-        let cursor_pos = self.wifi_credentials.cursor_pos;
-        if cursor_pos > 0 {
-            let char_index_to_delete = cursor_pos as usize - 1;
-            // getting all the chars before the char to delete
-            let before_char_to_delete = self
-                .wifi_credentials
-                .ssid
-                .chars()
-                .take(char_index_to_delete);
-
-            // getting all the chars after the car to delete
-            let after_char_to_delete = self.wifi_credentials.ssid.chars().skip(cursor_pos as usize);
-
-            self.wifi_credentials.ssid =
-                before_char_to_delete.chain(after_char_to_delete).collect();
-
-            // we are deleting the char to we need to more the cursor to the left
-            self.move_cursor_left();
-        }
-    }
-
-    fn move_cursor_left(&mut self) {
-        self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_sub(1);
-    }
-
-    fn move_cursor_right(&mut self) {
-        // Todo: this will move the cursor to the right and beyound the lenght of the string so need to handle that after
-        // doing some indexing in the string of the ssid and password
-        self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_add(1);
-    }
-    fn reset_cursor_position(&mut self) {
-        self.wifi_credentials.cursor_pos = 0;
     }
 }
 
@@ -478,7 +289,7 @@ impl Widget for &App {
             ssid_paragraph.render(popup_area, buf);
         }
 
-        if self.show_password_popup {
+        if self.wifi_credentials.show_password_popup {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter Password")
