@@ -362,6 +362,7 @@ impl App {
         self.move_cursor_right();
     }
 
+    // Todo: need to refactore this function with the acutal data type
     // here we are doing like this because removing a char from a string in rust is not straightforward
     fn delete_char(&mut self) {
         let cursor_pos = self.wifi_credentials.cursor_pos;
@@ -370,10 +371,16 @@ impl App {
             self.wifi_credentials.ssid.remove(char_index as usize);
             self.move_cursor_left();
 
+            // getting all the chars before the char to delete
             let before_char_to_delete = self.wifi_credentials.ssid.chars().take(char_index);
+
+            // getting all the chars after the car to delete
             let after_char_to_delete = self.wifi_credentials.ssid.chars().skip(cursor_pos as usize);
+
             self.wifi_credentials.ssid =
                 before_char_to_delete.chain(after_char_to_delete).collect();
+
+            // we are deleting the char to we need to more the cursor to the left
             self.move_cursor_left();
         }
     }
