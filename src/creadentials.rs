@@ -49,7 +49,6 @@ impl WifiCredentials {
                     ..
                 }) => {
                     self.show_ssid_popup = false;
-                    self.show_password_popup = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
@@ -72,9 +71,12 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
+                    // when ssid is entered, we should show the password popup
+                    // but if the user had entered a password before, we should keep it
+                    // so that the user can go back and forth without losing the password
                     self.show_ssid_popup = false;
                     self.show_password_popup = true;
-                    self.reset_cursor_position();
+                    self.cursor_pos = self.password.chars().count() as u16;
                 }
                 _ => {}
             };
@@ -104,7 +106,11 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
+                    // if we go back from password input, we should show the ssid popup again
+                    // with the cursor at the end of the ssid
                     self.show_password_popup = false;
+                    self.show_ssid_popup = true;
+                    self.cursor_pos = self.ssid.chars().count() as u16;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
