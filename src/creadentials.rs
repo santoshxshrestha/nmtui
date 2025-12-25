@@ -41,7 +41,7 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.move_cursor_right();
+                    move_cursor_right(&self.ssid, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
@@ -57,7 +57,7 @@ impl WifiCredentials {
                     ..
                 }) => {
                     enter_char(&mut self.ssid, c, &self.cursor_pos);
-                    self.move_cursor_right();
+                    move_cursor_right(&self.ssid, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
@@ -97,7 +97,7 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.move_cursor_right();
+                    move_cursor_right(&self.password, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
@@ -112,7 +112,7 @@ impl WifiCredentials {
                     ..
                 }) => {
                     enter_char(&mut self.password, c, &self.cursor_pos);
-                    self.move_cursor_right();
+                    move_cursor_right(&self.password, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
@@ -141,15 +141,15 @@ impl WifiCredentials {
         self.cursor_pos = self.cursor_pos.saturating_sub(1);
     }
 
-    fn move_cursor_right(&mut self) {
-        // ensuring the cursor does not go beyond the string length
-        // Todo: this shoudl also be about to handle the password string
-        self.cursor_pos = self.cursor_pos.saturating_add(1);
-        self.cursor_pos = self.cursor_pos.min(self.ssid.chars().count() as u16);
-    }
     fn reset_cursor_position(&mut self) {
         self.cursor_pos = 0;
     }
+}
+
+pub fn move_cursor_right(string: &String, cursor_pos: &mut u16) {
+    // ensuring the cursor does not go beyond the string length
+    *cursor_pos = cursor_pos.saturating_add(1);
+    *cursor_pos = (*cursor_pos).min(string.chars().count() as u16);
 }
 
 pub fn delete_char(string: &mut String, cursor_pos: &mut u16) {
