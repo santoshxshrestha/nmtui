@@ -6,6 +6,7 @@ use crate::connect_to_network;
 use crate::scan;
 use crate::scan_networks;
 use crossterm::ExecutableCommand;
+use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
@@ -391,7 +392,7 @@ impl Widget for &App {
                     popup_area.x + self.wifi_credentials.cursor_pos + 1,
                     popup_area.y + 1,
                 ),
-                EnableBlinking
+                DisableBlinking
             );
 
             ssid_paragraph.render(popup_area, buf);
@@ -417,15 +418,15 @@ impl Widget for &App {
                 .block(popup_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
-            let _ = execute!(
-                io::stdout(),
-                cursor::Show,
-                MoveTo(
-                    popup_area.x + self.wifi_credentials.cursor_pos + 1,
-                    popup_area.y + 1,
-                ),
-                EnableBlinking
-            );
+            // let _ = execute!(
+            //     io::stdout(),
+            //     cursor::Show,
+            //     MoveTo(
+            //         popup_area.x + self.wifi_credentials.cursor_pos + 1,
+            //         popup_area.y + 1,
+            //     ),
+            //     EnableBlinking
+            // );
 
             password_paragraph.render(popup_area, buf);
         }
