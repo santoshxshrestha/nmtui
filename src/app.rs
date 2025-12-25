@@ -356,6 +356,28 @@ impl App {
             .unwrap_or(self.wifi_credentials.ssid.len())
     }
 
+    fn enter_char(&mut self, c: char) {
+        let index = self.byte_index();
+        self.wifi_credentials.ssid.insert(index, c);
+        self.move_cursor_right();
+    }
+
+    // here we are doing like this because removing a char from a string in rust is not straightforward
+    fn delete_char(&mut self) {
+        let cursor_pos = self.wifi_credentials.cursor_pos;
+        if cursor_pos > 0 {
+            let char_index = cursor_pos as usize - 1;
+            self.wifi_credentials.ssid.remove(char_index as usize);
+            self.move_cursor_left();
+
+            let before_char_to_delete = self.wifi_credentials.ssid.chars().take(char_index);
+            let after_char_to_delete = self.wifi_credentials.ssid.chars().skip(cursor_pos as usize);
+            self.wifi_credentials.ssid =
+                before_char_to_delete.chain(after_char_to_delete).collect();
+            self.move_cursor_left();
+        }
+    }
+
     fn move_cursor_left(&mut self) {
         self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_sub(1);
     }
