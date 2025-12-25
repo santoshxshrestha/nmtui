@@ -345,6 +345,17 @@ impl App {
             }
         }
     }
+
+    // getting the byte index of the cursor position in the string(utf-8)
+    fn byte_index(&self) -> usize {
+        self.wifi_credentials
+            .ssid
+            .char_indices()
+            .map(|(i, _)| i)
+            .nth(self.wifi_credentials.cursor_pos as usize)
+            .unwrap_or(self.wifi_credentials.ssid.len())
+    }
+
     fn move_cursor_left(&mut self) {
         self.wifi_credentials.cursor_pos = self.wifi_credentials.cursor_pos.saturating_sub(1);
     }
