@@ -28,8 +28,7 @@ impl Status {
     }
 }
 
-#[derive(Debug)]
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct WifiCredentials {
     pub is_hidden: bool,
     pub ssid: String,
@@ -162,10 +161,11 @@ impl WifiCredentials {
     pub fn handle_status_message(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             if let Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) = event::read()? {
+                code: KeyCode::Esc,
+                kind: Press,
+                ..
+            }) = event::read()?
+            {
                 self.show_status_popup = false;
                 self.status.status_message.clear();
                 self.status.status_code = ExitStatus::default();
@@ -191,7 +191,7 @@ impl WifiCredentials {
     }
 }
 
-pub fn move_cursor_right(string: &String, cursor_pos: &mut u16) {
+pub fn move_cursor_right(string: &str, cursor_pos: &mut u16) {
     // ensuring the cursor does not go beyond the string length
     *cursor_pos = cursor_pos.saturating_add(1);
     *cursor_pos = (*cursor_pos).min(string.chars().count() as u16);
