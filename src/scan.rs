@@ -1,4 +1,5 @@
 use crate::WifiNetwork;
+use std::io::stdout;
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -24,18 +25,20 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
             let in_use = parts.next() == Some("*");
             let ssid = parts.next().unwrap_or("").to_string();
             let security = parts.next().unwrap_or("--").to_string();
-            networks.push(WifiNetwork {
-                in_use,
-                ssid,
-                security,
-            })
+            if !ssid.is_empty() {
+                networks.push(WifiNetwork {
+                    in_use,
+                    ssid,
+                    security,
+                })
+            }
         }
         networks.push(WifiNetwork {
             in_use: false,
             ssid: "Connect to Hidden network".to_string(),
             security: "?".to_string(),
         });
-        networks.retain(|network| !network.ssid.is_empty());
+        // networks.retain(|network| !network.ssid.is_empty());
         *wifi_list_lock = networks;
     });
 }
