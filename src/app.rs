@@ -40,7 +40,7 @@ impl Default for App {
         scan_networks(wifi_list.clone());
         Self {
             wifi_credentials: WifiCredentials::default(),
-            wifi_list: wifi_list,
+            wifi_list,
             selected: 0,
             app_state: AppState::default(),
         }
@@ -155,7 +155,6 @@ impl App {
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
                 if wifi_list[self.selected].in_use {
-                    return;
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();

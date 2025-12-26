@@ -13,7 +13,7 @@ impl Default for Status {
     fn default() -> Self {
         let status_message = String::new();
         Status {
-            status_message: status_message,
+            status_message,
             status_code: ExitStatus::default(),
         }
     }
@@ -22,13 +22,14 @@ impl Default for Status {
 impl Status {
     pub fn new(status_message: String, status_code: ExitStatus) -> Self {
         Self {
-            status_message: status_message,
+            status_message,
             status_code: ExitStatus::default(),
         }
     }
 }
 
 #[derive(Debug)]
+#[derive(Default)]
 pub struct WifiCredentials {
     pub is_hidden: bool,
     pub ssid: String,
@@ -40,20 +41,6 @@ pub struct WifiCredentials {
     pub status: Status,
 }
 
-impl Default for WifiCredentials {
-    fn default() -> Self {
-        WifiCredentials {
-            is_hidden: false,
-            ssid: String::new(),
-            password: String::new(),
-            cursor_pos: 0,
-            show_password_popup: false,
-            show_ssid_popup: false,
-            show_status_popup: false,
-            status: Status::default(),
-        }
-    }
-}
 impl WifiCredentials {
     pub fn handle_ssid_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
@@ -162,7 +149,7 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    if self.password.len() == 0 || self.password.chars().count() >= 8 {
+                    if self.password.is_empty() || self.password.chars().count() >= 8 {
                         self.prepare_to_connect();
                     }
                 }
@@ -174,17 +161,14 @@ impl WifiCredentials {
 
     pub fn handle_status_message(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
+            if let Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
                     ..
-                }) => {
-                    self.show_status_popup = false;
-                    self.status.status_message.clear();
-                    self.status.status_code = ExitStatus::default();
-                }
-                _ => {}
+                }) = event::read()? {
+                self.show_status_popup = false;
+                self.status.status_message.clear();
+                self.status.status_code = ExitStatus::default();
             };
         }
         Ok(())
@@ -192,7 +176,7 @@ impl WifiCredentials {
 
     fn prepare_to_connect(&mut self) {
         self.show_password_popup = false;
-        self.status = connect_to_network(&self);
+        self.status = connect_to_network(self);
         self.reset_cursor_position();
         self.is_hidden = false;
         self.show_status_popup = true;

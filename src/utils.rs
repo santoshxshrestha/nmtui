@@ -1,7 +1,6 @@
 use crate::WifiCredentials;
 use crate::app::App;
 use crate::creadentials::Status;
-use color_eyre::owo_colors::colors::xterm::StratosBlue;
 use std::process::{Command, ExitStatus};
 
 pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,7 +22,7 @@ pub fn connect_to_network(wifi_creadentials: &WifiCredentials) -> Status {
         Command::new("nmcli")
             .args(["dev", "wifi", "connect", ssid])
             .output()
-    } else if *is_hidden == true {
+    } else if *is_hidden {
         Command::new("nmcli")
             .args([
                 "dev", "wifi", "connect", ssid, "password", password, "hidden", "yes",
