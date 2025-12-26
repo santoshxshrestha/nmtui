@@ -170,7 +170,6 @@ impl WifiCredentials {
 
     fn prepare_to_connect(&mut self) {
         self.show_password_popup = false;
-        self.show_password_popup = false;
         self.status = connect_to_network(&self);
         self.reset_cursor_position();
     }
