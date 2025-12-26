@@ -21,17 +21,17 @@ pub fn connect_to_network(wifi_creadentials: &WifiCredentials) -> Status {
 
     let output = if password.is_empty() {
         Command::new("nmcli")
-            .args(&["dev", "wifi", "connect", &wifi_creadentials.ssid])
+            .args(["dev", "wifi", "connect", ssid])
             .output()
     } else if *is_hidden == true {
         Command::new("nmcli")
-            .args(&[
+            .args([
                 "dev", "wifi", "connect", ssid, "password", password, "hidden", "yes",
             ])
             .output()
     } else {
         Command::new("nmcli")
-            .args(&["dev", "wifi", "connect", ssid, "password", password])
+            .args(["dev", "wifi", "connect", ssid, "password", password])
             .output()
     };
 
