@@ -6,6 +6,7 @@ use crate::connect_to_network;
 use crate::scan;
 use crate::scan_networks;
 use crossterm::ExecutableCommand;
+use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
@@ -341,13 +342,12 @@ impl Widget for &App {
                     height: area.height / 4,
                 };
 
-                let status_paragraph = Paragraph::new(format!(
-                    "status code:{}\n {}",
-                    self.wifi_credentials.status.status_code,
-                    self.wifi_credentials.status.status_message
-                ))
-                .block(status_block)
-                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+                let status_paragraph =
+                    Paragraph::new(self.wifi_credentials.status.status_message.as_str())
+                        .block(status_block)
+                        .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+                let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
 
                 status_paragraph.render(status_area, buf);
             }
