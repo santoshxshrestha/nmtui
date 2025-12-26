@@ -8,12 +8,7 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
     thread::spawn(move || {
         let mut wifi_list_lock = wifi_list.lock().unwrap();
         let output = Command::new("nmcli")
-            .arg("-t")
-            .arg("-f")
-            .arg("IN-USE,SSID,SECURITY")
-            .arg("device")
-            .arg("wifi")
-            .arg("list")
+            .args(["-t", "-f", "IN-USE,SSID,SECURITY", "device", "wifi", "list"])
             .output()
             .expect("Failed to execute nmcli command");
 
