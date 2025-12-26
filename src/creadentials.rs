@@ -1,4 +1,5 @@
 use crate::connect_to_network;
+use color_eyre::owo_colors::OwoColorize;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, KeyModifiers, poll};
 use std::io;
 use std::process::ExitStatus;
@@ -160,7 +161,25 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.prepare_to_connect();
+                    if self.password.len() == 0 || self.password.chars().count() >= 8 {
+                        self.prepare_to_connect();
+                    }
+                }
+                _ => {}
+            };
+        }
+        Ok(())
+    }
+
+    pub fn handle_status_message(&mut self) -> io::Result<()> {
+        if poll(Duration::from_micros(1))? {
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.status.status_message.clear();
                 }
                 _ => {}
             };
@@ -170,9 +189,9 @@ impl WifiCredentials {
 
     fn prepare_to_connect(&mut self) {
         self.show_password_popup = false;
-        self.is_hidden = false;
         self.status = connect_to_network(&self);
         self.reset_cursor_position();
+        self.is_hidden = false;
     }
 
     fn move_cursor_left(&mut self) {
