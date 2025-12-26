@@ -324,7 +324,7 @@ impl Widget for &App {
 
             password_paragraph.render(popup_area, buf);
 
-            if self.wifi_credentials.status.status_message != "" {
+            if self.wifi_credentials.show_status_popup {
                 Clear.render(area, buf);
                 let status_block = Block::default()
                     .title("Status")

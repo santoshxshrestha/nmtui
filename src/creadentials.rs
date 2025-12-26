@@ -181,7 +181,9 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
+                    self.show_status_popup = false;
                     self.status.status_message.clear();
+                    self.status.status_code = ExitStatus::default();
                 }
                 _ => {}
             };
@@ -194,6 +196,7 @@ impl WifiCredentials {
         self.status = connect_to_network(&self);
         self.reset_cursor_position();
         self.is_hidden = false;
+        self.show_status_popup = true;
     }
 
     fn move_cursor_left(&mut self) {
