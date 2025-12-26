@@ -1,25 +1,21 @@
 use crate::AppState;
 use crate::WifiCredentials;
 use crate::WifiNetwork;
-use crate::connect_to_network;
-use crate::scan;
 use crate::scan_networks;
-use crossterm::ExecutableCommand;
 use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use crossterm::execute;
 use ratatui::widgets::Clear;
 use ratatui::{
     DefaultTerminal, Frame,
     buffer::Buffer,
-    layout::{Constraint, Rect, Rows},
+    layout::{Constraint, Rect},
     style::Stylize,
-    symbols::{block, border},
     text::Line,
-    widgets::{self, Block, Paragraph, Row, Table, TableState, Widget},
+    widgets::{Block, Paragraph, Row, Table, TableState, Widget},
 };
 use std::io;
 use std::sync::{Arc, Mutex};
@@ -33,10 +29,6 @@ const INFO_TEXT: [&str; 2] = [
 #[derive(Debug)]
 pub struct App {
     wifi_credentials: WifiCredentials,
-    connected: bool,
-    ip: String,
-    error: Arc<Mutex<String>>,
-    loading: bool,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
@@ -48,11 +40,7 @@ impl Default for App {
         scan_networks(wifi_list.clone());
         Self {
             wifi_credentials: WifiCredentials::default(),
-            connected: false,
-            ip: String::new(),
-            error: Arc::new(Mutex::new(String::new())),
-            loading: false,
-            wifi_list: wifi_list,
+            wifi_list,
             selected: 0,
             app_state: AppState::default(),
         }
@@ -167,7 +155,6 @@ impl App {
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
                 if wifi_list[self.selected].in_use {
-                    return;
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();

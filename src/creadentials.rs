@@ -1,6 +1,5 @@
 use crate::connect_to_network;
-use color_eyre::owo_colors::OwoColorize;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, KeyModifiers, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
 use std::process::ExitStatus;
 use std::time::Duration;
@@ -14,7 +13,7 @@ impl Default for Status {
     fn default() -> Self {
         let status_message = String::new();
         Status {
-            status_message: status_message,
+            status_message,
             status_code: ExitStatus::default(),
         }
     }
@@ -23,13 +22,13 @@ impl Default for Status {
 impl Status {
     pub fn new(status_message: String, status_code: ExitStatus) -> Self {
         Self {
-            status_message: status_message,
+            status_message,
             status_code: ExitStatus::default(),
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct WifiCredentials {
     pub is_hidden: bool,
     pub ssid: String,
@@ -41,20 +40,6 @@ pub struct WifiCredentials {
     pub status: Status,
 }
 
-impl Default for WifiCredentials {
-    fn default() -> Self {
-        WifiCredentials {
-            is_hidden: false,
-            ssid: String::new(),
-            password: String::new(),
-            cursor_pos: 0,
-            show_password_popup: false,
-            show_ssid_popup: false,
-            show_status_popup: false,
-            status: Status::default(),
-        }
-    }
-}
 impl WifiCredentials {
     pub fn handle_ssid_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
@@ -163,7 +148,7 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    if self.password.len() == 0 || self.password.chars().count() >= 8 {
+                    if self.password.is_empty() || self.password.chars().count() >= 8 {
                         self.prepare_to_connect();
                     }
                 }
@@ -175,17 +160,15 @@ impl WifiCredentials {
 
     pub fn handle_status_message(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.show_status_popup = false;
-                    self.status.status_message.clear();
-                    self.status.status_code = ExitStatus::default();
-                }
-                _ => {}
+            if let Event::Key(KeyEvent {
+                code: KeyCode::Esc,
+                kind: Press,
+                ..
+            }) = event::read()?
+            {
+                self.show_status_popup = false;
+                self.status.status_message.clear();
+                self.status.status_code = ExitStatus::default();
             };
         }
         Ok(())
@@ -193,7 +176,7 @@ impl WifiCredentials {
 
     fn prepare_to_connect(&mut self) {
         self.show_password_popup = false;
-        self.status = connect_to_network(&self);
+        self.status = connect_to_network(self);
         self.reset_cursor_position();
         self.is_hidden = false;
         self.show_status_popup = true;
@@ -208,7 +191,7 @@ impl WifiCredentials {
     }
 }
 
-pub fn move_cursor_right(string: &String, cursor_pos: &mut u16) {
+pub fn move_cursor_right(string: &str, cursor_pos: &mut u16) {
     // ensuring the cursor does not go beyond the string length
     *cursor_pos = cursor_pos.saturating_add(1);
     *cursor_pos = (*cursor_pos).min(string.chars().count() as u16);
@@ -233,7 +216,7 @@ pub fn enter_char(string: &mut String, c: char, cursor_pos: &u16) {
 }
 
 // getting the byte index of the cursor position in the string(utf-8)
-pub fn byte_index(string: &String, cursor_pos: &u16) -> usize {
+pub fn byte_index(string: &str, cursor_pos: &u16) -> usize {
     string
         .char_indices()
         .map(|(i, _)| i)
