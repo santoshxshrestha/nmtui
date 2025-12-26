@@ -37,6 +37,7 @@ pub struct WifiCredentials {
     pub cursor_pos: u16,
     pub show_password_popup: bool,
     pub show_ssid_popup: bool,
+    pub show_status_popup: bool,
     pub status: Status,
 }
 
@@ -49,6 +50,7 @@ impl Default for WifiCredentials {
             cursor_pos: 0,
             show_password_popup: false,
             show_ssid_popup: false,
+            show_status_popup: false,
             status: Status::default(),
         }
     }
