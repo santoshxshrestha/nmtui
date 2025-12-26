@@ -11,6 +11,7 @@ pub struct WifiCredentials {
     pub cursor_pos: u16,
     pub show_password_popup: bool,
     pub show_ssid_popup: bool,
+    pub status_message: String,
 }
 
 impl Default for WifiCredentials {
@@ -22,6 +23,7 @@ impl Default for WifiCredentials {
             cursor_pos: 0,
             show_password_popup: false,
             show_ssid_popup: false,
+            status_message: String::new(),
         }
     }
 }
@@ -133,14 +135,23 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_password_popup = false;
-                    connect_to_network(&self);
-                    self.reset_cursor_position();
+                    self.prepare_to_connect();
                 }
                 _ => {}
             };
         }
         Ok(())
+    }
+
+    fn prepare_to_connect(&mut self) {
+        self.show_password_popup = false;
+        self.show_password_popup = false;
+        if let Err(e) = connect_to_network(&self) {
+            self.status_message = format!("Failed to connect: {}", e);
+        } else {
+            self.status_message = "Connected successfully!".to_string();
+        }
+        self.reset_cursor_position();
     }
 
     fn move_cursor_left(&mut self) {
