@@ -6,6 +6,7 @@ use crate::connect_to_network;
 use crate::scan;
 use crate::scan_networks;
 use crossterm::ExecutableCommand;
+use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
@@ -66,11 +67,12 @@ impl App {
     ) -> Result<(), Box<dyn std::error::Error>> {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
+
             if self.wifi_credentials.show_ssid_popup {
                 self.wifi_credentials.handle_ssid_input()?;
             } else if self.wifi_credentials.show_password_popup {
                 self.wifi_credentials.handle_password_input()?;
-            } else if self.wifi_credentials.status.status_message != "" {
+            } else if self.wifi_credentials.show_status_popup {
                 self.wifi_credentials.handle_status_message()?;
             } else {
                 self.handle_events()?;
@@ -322,34 +324,31 @@ impl Widget for &App {
             );
 
             password_paragraph.render(popup_area, buf);
+        }
 
-            if self.wifi_credentials.status.status_message != "" {
-                Clear.render(area, buf);
-                let status_block = Block::default()
-                    .title("Status")
-                    .borders(ratatui::widgets::Borders::ALL)
-                    .border_type(ratatui::widgets::BorderType::Rounded)
-                    .border_style(
-                        ratatui::style::Style::default().fg(ratatui::style::Color::Magenta),
-                    );
+        if self.wifi_credentials.show_status_popup {
+            Clear.render(area, buf);
+            let status_block = Block::default()
+                .title("Status")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
 
-                let status_area = Rect {
-                    x: area.x + area.width / 4,
-                    y: area.y + area.height / 3,
-                    width: area.width / 2,
-                    height: area.height / 4,
-                };
+            let status_area = Rect {
+                x: area.x + area.width / 4,
+                y: area.y + area.height / 3,
+                width: area.width / 2,
+                height: area.height / 4,
+            };
 
-                let status_paragraph = Paragraph::new(format!(
-                    "status code:{}\n {}",
-                    self.wifi_credentials.status.status_code,
-                    self.wifi_credentials.status.status_message
-                ))
-                .block(status_block)
-                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+            let status_paragraph =
+                Paragraph::new(self.wifi_credentials.status.status_message.as_str())
+                    .block(status_block)
+                    .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
-                status_paragraph.render(status_area, buf);
-            }
+            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
+
+            status_paragraph.render(status_area, buf);
         }
     }
 }
