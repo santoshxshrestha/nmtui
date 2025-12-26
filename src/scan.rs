@@ -1,5 +1,4 @@
 use crate::WifiNetwork;
-use std::io::stdout;
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::thread;
