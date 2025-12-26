@@ -168,6 +168,22 @@ impl WifiCredentials {
         Ok(())
     }
 
+    pub fn handle_status_message(&mut self) -> io::Result<()> {
+        if poll(Duration::from_micros(1))? {
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.status.status_message.clear();
+                }
+                _ => {}
+            };
+        }
+        Ok(())
+    }
+
     fn prepare_to_connect(&mut self) {
         self.show_password_popup = false;
         self.is_hidden = false;
