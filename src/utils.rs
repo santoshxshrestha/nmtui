@@ -1,6 +1,8 @@
 use crate::WifiCredentials;
 use crate::app::App;
-use std::process::Command;
+use crate::creadentials::Status;
+use color_eyre::owo_colors::colors::xterm::StratosBlue;
+use std::process::{Command, ExitStatus};
 
 pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = ratatui::init();
@@ -9,9 +11,7 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
     app_result
 }
 
-pub fn connect_to_network(
-    wifi_creadentials: &WifiCredentials,
-) -> Result<(), Box<dyn std::error::Error>> {
+pub fn connect_to_network(wifi_creadentials: &WifiCredentials) -> Status {
     let WifiCredentials {
         is_hidden,
         ssid,
@@ -19,25 +19,36 @@ pub fn connect_to_network(
         ..
     } = wifi_creadentials;
 
-    let status = if password.is_empty() {
+    let output = if password.is_empty() {
         Command::new("nmcli")
             .args(&["dev", "wifi", "connect", &wifi_creadentials.ssid])
-            .status()?
+            .output()
     } else if *is_hidden == true {
         Command::new("nmcli")
             .args(&[
                 "dev", "wifi", "connect", ssid, "password", password, "hidden", "yes",
             ])
-            .status()?
+            .output()
     } else {
         Command::new("nmcli")
             .args(&["dev", "wifi", "connect", ssid, "password", password])
-            .status()?
+            .output()
     };
 
-    if status.success() {
-        Ok(())
-    } else {
-        Err("Failed to connect to the network".into())
+    match output {
+        Ok(output) => {
+            let status = output.status;
+            if status.success() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                Status::new(stdout.to_string(), status)
+            } else {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                Status::new(stderr.to_string(), status)
+            }
+        }
+        Err(e) => Status::new(
+            format!("Failed to execute nmcli: {}", e),
+            ExitStatus::default(),
+        ),
     }
 }

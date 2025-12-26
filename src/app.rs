@@ -269,7 +269,7 @@ impl Widget for &App {
                 x: area.x + area.width / 4,
                 y: area.y + area.height / 4,
                 width: area.width / 2,
-                height: area.height / 4,
+                height: area.height / 10,
             };
 
             let ssid_paragraph = Paragraph::new(self.wifi_credentials.ssid.as_str())
@@ -302,7 +302,7 @@ impl Widget for &App {
                 x: area.x + area.width / 4,
                 y: area.y + area.height / 4,
                 width: area.width / 2,
-                height: area.height / 4,
+                height: area.height / 10,
             };
 
             let password_paragraph = Paragraph::new(self.wifi_credentials.password.as_str())

@@ -1,7 +1,32 @@
 use crate::connect_to_network;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, KeyModifiers, poll};
 use std::io;
+use std::process::ExitStatus;
 use std::time::Duration;
+
+#[derive(Debug)]
+pub struct Status {
+    pub status_message: String,
+    pub status_code: ExitStatus,
+}
+impl Default for Status {
+    fn default() -> Self {
+        let status_message = String::new();
+        Status {
+            status_message: status_message,
+            status_code: ExitStatus::default(),
+        }
+    }
+}
+
+impl Status {
+    pub fn new(status_message: String, status_code: ExitStatus) -> Self {
+        Self {
+            status_message: status_message,
+            status_code: ExitStatus::default(),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct WifiCredentials {
@@ -11,6 +36,7 @@ pub struct WifiCredentials {
     pub cursor_pos: u16,
     pub show_password_popup: bool,
     pub show_ssid_popup: bool,
+    pub status: Status,
 }
 
 impl Default for WifiCredentials {
@@ -22,6 +48,7 @@ impl Default for WifiCredentials {
             cursor_pos: 0,
             show_password_popup: false,
             show_ssid_popup: false,
+            status: Status::default(),
         }
     }
 }
@@ -133,14 +160,19 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_password_popup = false;
-                    connect_to_network(&self);
-                    self.reset_cursor_position();
+                    self.prepare_to_connect();
                 }
                 _ => {}
             };
         }
         Ok(())
+    }
+
+    fn prepare_to_connect(&mut self) {
+        self.show_password_popup = false;
+        self.is_hidden = false;
+        self.status = connect_to_network(&self);
+        self.reset_cursor_position();
     }
 
     fn move_cursor_left(&mut self) {
