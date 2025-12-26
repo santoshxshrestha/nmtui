@@ -1,6 +1,5 @@
 use crate::connect_to_network;
-use color_eyre::owo_colors::OwoColorize;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, KeyModifiers, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
 use std::process::ExitStatus;
 use std::time::Duration;
@@ -233,7 +232,7 @@ pub fn enter_char(string: &mut String, c: char, cursor_pos: &u16) {
 }
 
 // getting the byte index of the cursor position in the string(utf-8)
-pub fn byte_index(string: &String, cursor_pos: &u16) -> usize {
+pub fn byte_index(string: &str, cursor_pos: &u16) -> usize {
     string
         .char_indices()
         .map(|(i, _)| i)
