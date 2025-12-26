@@ -15,14 +15,9 @@ struct WifiNetwork {
     security: String,
 }
 
-#[derive(Debug)]
+#[derive(Default, Debug)]
 struct AppState {
     exit: bool,
-}
-impl Default for AppState {
-    fn default() -> Self {
-        AppState { exit: false }
-    }
 }
 
 fn main() -> Result<()> {
