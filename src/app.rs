@@ -322,6 +322,34 @@ impl Widget for &App {
             );
 
             password_paragraph.render(popup_area, buf);
+
+            if self.wifi_credentials.status.status_message != "" {
+                Clear.render(area, buf);
+                let status_block = Block::default()
+                    .title("Status")
+                    .borders(ratatui::widgets::Borders::ALL)
+                    .border_type(ratatui::widgets::BorderType::Rounded)
+                    .border_style(
+                        ratatui::style::Style::default().fg(ratatui::style::Color::Magenta),
+                    );
+
+                let status_area = Rect {
+                    x: area.x + area.width / 4,
+                    y: area.y + area.height / 3,
+                    width: area.width / 2,
+                    height: area.height / 4,
+                };
+
+                let status_paragraph = Paragraph::new(format!(
+                    "status code:{}\n {}",
+                    self.wifi_credentials.status.status_code,
+                    self.wifi_credentials.status.status_message
+                ))
+                .block(status_block)
+                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+                status_paragraph.render(status_area, buf);
+            }
         }
     }
 }
