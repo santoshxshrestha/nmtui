@@ -37,7 +37,7 @@ pub struct Flags {
 }
 
 #[derive(Debug, Default)]
-pub struct WifiCredentials {
+pub struct WifiInputState {
     pub ssid: String,
     pub password: String,
     pub cursor_pos: u16,
@@ -45,7 +45,7 @@ pub struct WifiCredentials {
     pub flags: Flags,
 }
 
-impl WifiCredentials {
+impl WifiInputState {
     pub fn handle_ssid_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
