@@ -32,8 +32,8 @@ impl Status {
 
 impl WifiInputState {
     pub fn handle_status_message(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            if let Event::Key(KeyEvent {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
                 code: KeyCode::Esc,
                 kind: Press,
                 ..
@@ -43,7 +43,6 @@ impl WifiInputState {
                 self.status.status_message.clear();
                 self.status.status_code = ExitStatus::default();
             };
-        }
         Ok(())
     }
 }
