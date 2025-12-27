@@ -1,7 +1,5 @@
 use super::App;
-use crate::WifiCredentials;
-use crate::scan::scan_networks;
-use crate::scan_networks;
+use crate::utils::scan::scan_networks;
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;

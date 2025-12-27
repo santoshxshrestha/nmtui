@@ -1,6 +1,7 @@
 use color_eyre::eyre::Result;
 mod apps;
 mod utils;
+use utils::tui::tui;
 
 #[derive(Debug)]
 struct WifiNetwork {
