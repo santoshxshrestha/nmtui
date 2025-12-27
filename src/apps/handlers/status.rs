@@ -30,16 +30,28 @@ impl Status {
 
 impl WifiInputState {
     pub fn handle_status_message(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))?
-            && let Event::Key(KeyEvent {
-                code: KeyCode::Esc,
-                kind: Press,
-                ..
-            }) = event::read()?
-        {
-            self.flags.show_status_popup = false;
-            self.status.status_message.clear();
-            self.status.status_code = ExitStatus::default();
+        if poll(Duration::from_micros(1))? {
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.flags.show_status_popup = false;
+                    self.status.status_message.clear();
+                    self.status.status_code = ExitStatus::default();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Enter,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.flags.show_status_popup = false;
+                    self.status.status_message.clear();
+                    self.status.status_code = ExitStatus::default();
+                }
+                _ => {}
+            }
         };
         Ok(())
     }
