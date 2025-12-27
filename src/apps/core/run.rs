@@ -1,4 +1,5 @@
 use super::App;
+use ratatui::DefaultTerminal;
 
 impl App {
     pub fn run(

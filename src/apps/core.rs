@@ -1,4 +1,3 @@
-#![allow(unused)]
 mod event_handlers;
 mod run;
 mod widget;
@@ -6,29 +5,8 @@ use crate::AppState;
 use crate::WifiCredentials;
 use crate::WifiNetwork;
 use crate::scan_networks;
-use crossterm::cursor::DisableBlinking;
-use crossterm::cursor::EnableBlinking;
-use crossterm::cursor::{self, MoveTo};
-use crossterm::event::KeyEventKind::Press;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
-use crossterm::execute;
-use ratatui::widgets::Clear;
-use ratatui::{
-    DefaultTerminal, Frame,
-    buffer::Buffer,
-    layout::{Constraint, Rect},
-    style::Stylize,
-    text::Line,
-    widgets::{Block, Paragraph, Row, Table, TableState, Widget},
-};
-use std::io;
+use ratatui::Frame;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
-
-const INFO_TEXT: [&str; 2] = [
-    "(Esc) quit | (Ctrl+C) quit | (Ctrl+R) scan for networks ",
-    "(Enter|o) connect to network | (↑|k) move up | (↓|j) move down",
-];
 
 #[derive(Debug)]
 pub struct App {

@@ -1,31 +1,14 @@
-#![allow(unused)]
 use super::App;
-use crate::AppState;
 use crate::WifiCredentials;
-use crate::WifiNetwork;
 use crate::scan::scan_networks;
 use crate::scan_networks;
-use crossterm::cursor::DisableBlinking;
-use crossterm::cursor::EnableBlinking;
-use crossterm::cursor::{self, MoveTo};
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
-use crossterm::execute;
-use ratatui::widgets::Clear;
-use ratatui::{
-    DefaultTerminal, Frame,
-    buffer::Buffer,
-    layout::{Constraint, Rect},
-    style::Stylize,
-    text::Line,
-    widgets::{Block, Paragraph, Row, Table, TableState, Widget},
-};
 use std::io;
-use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 impl App {
-    fn handle_events(&mut self) -> io::Result<()> {
+    pub fn handle_events(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
