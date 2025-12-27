@@ -1,32 +1,28 @@
 use std::process::Command;
-use std::thread;
 
-pub struct SavedConnection {
-    pub ssid: String,
-    pub connection_type: String,
-}
+pub fn saved_connections() -> Vec<String> {
+    // nmcli -t -f NAME,TYPE connection show
+    let output = Command::new("nmcli")
+        .args(["-t", "-f", "NAME,TYPE", "connection", "show"])
+        .output()
+        .expect(" Failed to execute nmcli command");
 
-pub fn saved_connections() {
-    thread::spawn(move || {
-        let output = Command::new("nmcli")
-            .args(["-f", "NAME,TYPE", "connection", "show"])
-            .output()
-            .expect(" Failed to execute nmcli command");
-        if !output.status.success() {
-            return;
+    let mut ssids: Vec<String> = Vec::new();
+    if !output.status.success() {
+        return ssids;
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    // header is already handled by nmcli with -t flag
+    for line in stdout.lines() {
+        let mut parts = line.splitn(2, ':');
+        let ssid = parts.next().unwrap_or("").to_string();
+        let connection_type = parts.next().unwrap_or("").to_string();
+
+        // we are only interested in wifi saved connections
+        if !ssid.is_empty() && !connection_type.is_empty() && connection_type == "802-11-wireless" {
+            ssids.push(ssid);
         }
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let mut networks: Vec<SavedConnection> = Vec::new();
-        for line in stdout.lines() {
-            let mut parts = line.splitn(2, ' ');
-            let ssid = parts.next().unwrap_or("").to_string();
-            let connection_type = parts.next().unwrap_or("").to_string();
-            if !ssid.is_empty() && !connection_type.is_empty() && connection_type == "wifi" {
-                networks.push(SavedConnection {
-                    ssid,
-                    connection_type,
-                });
-            }
-        }
-    });
+    }
+    return ssids;
 }

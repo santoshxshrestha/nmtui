@@ -5,6 +5,7 @@ use utils::tui::tui;
 
 #[derive(Debug)]
 struct WifiNetwork {
+    is_saved: bool,
     in_use: bool,
     ssid: String,
     security: String,
