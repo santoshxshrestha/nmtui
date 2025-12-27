@@ -23,21 +23,26 @@ impl Status {
     pub fn new(status_message: String, status_code: ExitStatus) -> Self {
         Self {
             status_message,
-            status_code: ExitStatus::default(),
+            status_code,
         }
     }
 }
 
 #[derive(Debug, Default)]
-pub struct WifiCredentials {
+pub struct Flags {
     pub is_hidden: bool,
-    pub ssid: String,
-    pub password: String,
-    pub cursor_pos: u16,
     pub show_password_popup: bool,
     pub show_ssid_popup: bool,
     pub show_status_popup: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct WifiCredentials {
+    pub ssid: String,
+    pub password: String,
+    pub cursor_pos: u16,
     pub status: Status,
+    pub flags: Flags,
 }
 
 impl WifiCredentials {
@@ -63,7 +68,7 @@ impl WifiCredentials {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_ssid_popup = false;
+                    self.flags.show_ssid_popup = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
@@ -89,8 +94,8 @@ impl WifiCredentials {
                     // when ssid is entered, we should show the password popup
                     // but if the user had entered a password before, we should keep it
                     // so that the user can go back and forth without losing the password
-                    self.show_ssid_popup = false;
-                    self.show_password_popup = true;
+                    self.flags.show_ssid_popup = false;
+                    self.flags.show_password_popup = true;
                     self.cursor_pos = self.password.chars().count() as u16;
                 }
                 _ => {}
@@ -123,8 +128,8 @@ impl WifiCredentials {
                 }) => {
                     // if we go back from password input, we should show the ssid popup again
                     // with the cursor at the end of the ssid
-                    self.show_password_popup = false;
-                    self.show_ssid_popup = true;
+                    self.flags.show_password_popup = false;
+                    self.flags.show_ssid_popup = true;
                     self.cursor_pos = self.ssid.chars().count() as u16;
                 }
                 Event::Key(KeyEvent {
@@ -166,7 +171,7 @@ impl WifiCredentials {
                 ..
             }) = event::read()?
             {
-                self.show_status_popup = false;
+                self.flags.show_status_popup = false;
                 self.status.status_message.clear();
                 self.status.status_code = ExitStatus::default();
             };
@@ -175,11 +180,11 @@ impl WifiCredentials {
     }
 
     fn prepare_to_connect(&mut self) {
-        self.show_password_popup = false;
+        self.flags.show_password_popup = false;
         self.status = connect_to_network(self);
         self.reset_cursor_position();
-        self.is_hidden = false;
-        self.show_status_popup = true;
+        self.flags.is_hidden = false;
+        self.flags.show_status_popup = true;
     }
 
     fn move_cursor_left(&mut self) {

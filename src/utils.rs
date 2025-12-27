@@ -1,5 +1,6 @@
 use crate::WifiCredentials;
 use crate::app::App;
+use crate::creadentials::Flags;
 use crate::creadentials::Status;
 use std::process::{Command, ExitStatus};
 
@@ -12,7 +13,7 @@ pub fn tui() -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn connect_to_network(wifi_creadentials: &WifiCredentials) -> Status {
     let WifiCredentials {
-        is_hidden,
+        flags: Flags { is_hidden, .. },
         ssid,
         password,
         ..
