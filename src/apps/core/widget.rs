@@ -1,6 +1,4 @@
 use super::App;
-use crate::WifiCredentials;
-use crate::scan_networks;
 use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};
