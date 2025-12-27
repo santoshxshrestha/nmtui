@@ -1,7 +1,7 @@
-mod flags;
+pub mod flags;
 mod password_handler;
 mod ssid_handler;
-mod status;
+pub mod status;
 mod utils;
 use crate::utils::connect::connect_to_network;
 use flags::Flags;

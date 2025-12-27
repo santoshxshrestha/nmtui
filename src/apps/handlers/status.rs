@@ -5,6 +5,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll
 use std::io;
 use std::process::ExitStatus;
 use std::time::Duration;
+
 #[derive(Debug)]
 pub struct Status {
     pub status_message: String,

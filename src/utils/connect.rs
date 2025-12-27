@@ -1,8 +1,10 @@
+use crate::apps::handlers::WifiInputState;
+use crate::apps::handlers::flags::Flags;
+use crate::apps::handlers::status::Status;
 use std::process::{Command, ExitStatus};
 
-
-pub fn connect_to_network(wifi_creadentials: &WifiCredentials) -> Status {
-    let WifiCredentials {
+pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
+    let WifiInputState {
         flags: Flags { is_hidden, .. },
         ssid,
         password,
