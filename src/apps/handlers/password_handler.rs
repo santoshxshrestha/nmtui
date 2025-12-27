@@ -1,8 +1,7 @@
-#![allow(unused)]
 use super::WifiInputState;
+use super::utils::{delete_char, enter_char, move_cursor_right};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
-use std::process::ExitStatus;
 use std::time::Duration;
 impl WifiInputState {
     pub fn handle_ssid_input(&mut self) -> io::Result<()> {

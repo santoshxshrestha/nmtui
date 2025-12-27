@@ -1,8 +1,7 @@
-#![allow(unused)]
+use super::utils::{delete_char, enter_char, move_cursor_right};
 use crate::apps::handlers::WifiInputState;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
-use std::process::ExitStatus;
 use std::time::Duration;
 
 impl WifiInputState {
