@@ -29,7 +29,7 @@ impl Widget for &App {
             .title(title)
             .title_bottom(Line::from(INFO_TEXT.join(" ")).italic().centered());
 
-        let header = Row::new(vec!["SSID", "SECURITY"]).style(
+        let header = Row::new(vec!["SSID", "SECURITY", "SAVED"]).style(
             ratatui::style::Style::default()
                 .fg(ratatui::style::Color::Yellow)
                 .bold(),
@@ -44,7 +44,11 @@ impl Widget for &App {
                     } else {
                         network.ssid.clone()
                     };
-                    let mut row = Row::new(vec![ssid, network.security.clone()]);
+                    let mut row = Row::new(vec![
+                        ssid,
+                        network.security.clone(),
+                        network.is_saved.to_string(),
+                    ]);
                     if i == self.selected {
                         row = row.style(
                             ratatui::style::Style::default()
@@ -60,7 +64,11 @@ impl Widget for &App {
             }
         }
 
-        let widths = [Constraint::Percentage(70), Constraint::Percentage(30)];
+        let widths = [
+            Constraint::Percentage(60),
+            Constraint::Percentage(20),
+            Constraint::Percentage(20),
+        ];
 
         let table = Table::new(rows, widths)
             .header(header)
