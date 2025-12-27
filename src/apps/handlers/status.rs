@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use super::WifiInputState;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
