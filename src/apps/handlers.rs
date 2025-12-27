@@ -1,9 +1,9 @@
+mod flags;
 mod password_handler;
 mod ssid_handler;
-mod utils;
-use crate::connect_to_network;
-mod flags;
 mod status;
+mod utils;
+use crate::utils::connect::connect_to_network;
 use flags::Flags;
 use status::Status;
 
