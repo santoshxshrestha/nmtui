@@ -38,11 +38,11 @@ impl WifiInputState {
                 kind: Press,
                 ..
             }) = event::read()?
-            {
-                self.flags.show_status_popup = false;
-                self.status.status_message.clear();
-                self.status.status_code = ExitStatus::default();
-            };
+        {
+            self.flags.show_status_popup = false;
+            self.status.status_message.clear();
+            self.status.status_code = ExitStatus::default();
+        };
         Ok(())
     }
 }
