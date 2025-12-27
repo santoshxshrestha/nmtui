@@ -326,11 +326,15 @@ impl Widget for &App {
                 width: area.width / 2,
                 height: area.height / 4,
             };
+            let stauts = format!(
+                "{}\n{}",
+                self.wifi_credentials.status.status_code,
+                self.wifi_credentials.status.status_message
+            );
 
-            let status_paragraph =
-                Paragraph::new(self.wifi_credentials.status.status_message.as_str())
-                    .block(status_block)
-                    .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+            let status_paragraph = Paragraph::new(stauts)
+                .block(status_block)
+                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
             let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
 
