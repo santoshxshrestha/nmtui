@@ -34,7 +34,9 @@ pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
         Ok(output) => {
             let status = output.status;
             if status.success() {
-                let stdout = String::from_utf8_lossy(&output.stdout);
+                // here this thing is creating some glitch in the ui when connecting successfully
+                // let stdout = String::from_utf8_lossy(&output.stdout);
+                let stdout = format!("Successfully connected to '{}'", ssid);
                 Status::new(stdout.to_string(), status)
             } else {
                 let stderr = String::from_utf8_lossy(&output.stderr);
