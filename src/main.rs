@@ -1,13 +1,6 @@
 use color_eyre::eyre::Result;
-mod app;
 mod apps;
-mod scan;
 mod utils;
-use scan::scan_networks;
-use utils::connect_to_network;
-use utils::tui;
-mod creadentials;
-use creadentials::WifiCredentials;
 
 #[derive(Debug)]
 struct WifiNetwork {

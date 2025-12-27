@@ -2,15 +2,15 @@ mod event_handlers;
 mod run;
 mod widget;
 use crate::AppState;
-use crate::WifiCredentials;
 use crate::WifiNetwork;
-use crate::scan_networks;
+use crate::apps::handlers::WifiInputState;
+use crate::utils::scan::scan_networks;
 use ratatui::Frame;
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug)]
 pub struct App {
-    wifi_credentials: WifiCredentials,
+    wifi_credentials: WifiInputState,
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
@@ -21,7 +21,7 @@ impl Default for App {
         let wifi_list = Arc::new(Mutex::new(Vec::new()));
         scan_networks(wifi_list.clone());
         Self {
-            wifi_credentials: WifiCredentials::default(),
+            wifi_credentials: WifiInputState::default(),
             wifi_list,
             selected: 0,
             app_state: AppState::default(),
