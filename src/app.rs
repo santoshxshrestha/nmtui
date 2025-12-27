@@ -55,11 +55,11 @@ impl App {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
 
-            if self.wifi_credentials.show_ssid_popup {
+            if self.wifi_credentials.flags.show_ssid_popup {
                 self.wifi_credentials.handle_ssid_input()?;
-            } else if self.wifi_credentials.show_password_popup {
+            } else if self.wifi_credentials.flags.show_password_popup {
                 self.wifi_credentials.handle_password_input()?;
-            } else if self.wifi_credentials.show_status_popup {
+            } else if self.wifi_credentials.flags.show_status_popup {
                 self.wifi_credentials.handle_status_message()?;
             } else {
                 self.handle_events()?;
@@ -159,17 +159,17 @@ impl App {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
                 } else if wifi_list[self.selected].ssid == "Connect to Hidden network" {
-                    self.wifi_credentials.is_hidden = true;
-                    self.wifi_credentials.show_ssid_popup = true;
+                    self.wifi_credentials.flags.is_hidden = true;
+                    self.wifi_credentials.flags.show_ssid_popup = true;
 
                     // if the wifi is hidden, then the ssid should be entered manually and the
                     // passoword popupo should be shown by the listner of the enter of the in the
                     // ssid input
-                    self.wifi_credentials.show_password_popup = false;
+                    self.wifi_credentials.flags.show_password_popup = false;
                     self.wifi_credentials.ssid.clear();
                     self.wifi_credentials.password.clear();
                 } else {
-                    self.wifi_credentials.show_password_popup = true;
+                    self.wifi_credentials.flags.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
                 }
@@ -247,7 +247,7 @@ impl Widget for &App {
         table.render(area, buf);
 
         // handle the render of the ssid input popup for hidden networks
-        if self.wifi_credentials.is_hidden {
+        if self.wifi_credentials.flags.is_hidden {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter the ssid of the hidden network")
@@ -279,7 +279,7 @@ impl Widget for &App {
             ssid_paragraph.render(popup_area, buf);
         }
 
-        if self.wifi_credentials.show_password_popup {
+        if self.wifi_credentials.flags.show_password_popup {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter Password")
@@ -312,7 +312,7 @@ impl Widget for &App {
             password_paragraph.render(popup_area, buf);
         }
 
-        if self.wifi_credentials.show_status_popup {
+        if self.wifi_credentials.flags.show_status_popup {
             Clear.render(area, buf);
             let status_block = Block::default()
                 .title("Status")
