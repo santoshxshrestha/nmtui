@@ -23,7 +23,7 @@ impl Status {
     pub fn new(status_message: String, status_code: ExitStatus) -> Self {
         Self {
             status_message,
-            status_code: ExitStatus::default(),
+            status_code,
         }
     }
 }
