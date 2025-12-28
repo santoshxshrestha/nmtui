@@ -81,6 +81,8 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
+                    // Todo: need to handle this safely with a conformation prompt before deleting
+                    // the connection out there
                     let ssid = self.wifi_list.lock().unwrap()[self.selected].ssid.clone();
                     delete_connection(ssid);
                     scan_networks(self.wifi_list.clone());
