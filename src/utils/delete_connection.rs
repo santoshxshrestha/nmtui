@@ -8,7 +8,6 @@ pub fn delete_connection(ssid: String) {
             .args(["connection", "delete", "id", ssid.trim()])
             .output()
             .expect(" Failed to execute nmcli command");
-        if !output.status.success() {
-        }
+        if !output.status.success() {}
     });
 }
