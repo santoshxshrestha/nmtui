@@ -56,6 +56,9 @@ impl App {
                     let status = connect_to_saved_network(&wifi_list[self.selected].ssid);
                     self.wifi_credentials.status = status;
                     self.wifi_credentials.flags.show_status_popup = true;
+
+                    // refresh the network list after connection attempt
+                    scan_networks(self.wifi_list.clone());
                 }
                 // if the selected network is hidden network option
                 // the show status popup will be handled by the password input listener
@@ -74,6 +77,8 @@ impl App {
                     let status = connect_to_saved_network(&wifi_list[self.selected].ssid);
                     self.wifi_credentials.status = status;
                     self.wifi_credentials.flags.show_status_popup = true;
+                    // refresh the network list after connection attempt
+                    scan_networks(self.wifi_list.clone());
                 }
                 // else show the password popup
                 else {
