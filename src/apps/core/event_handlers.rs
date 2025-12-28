@@ -1,6 +1,6 @@
 use super::App;
 use crate::utils::delete_connection::delete_connection;
-use crate::utils::scan::{self, scan_networks};
+use crate::utils::scan::scan_networks;
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
