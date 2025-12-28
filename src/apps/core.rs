@@ -69,6 +69,8 @@ impl App {
                     // passoword popupo should be shown by the listner of the enter of the in the
                     // ssid input
                     self.wifi_credentials.flags.show_password_popup = false;
+
+                    // clear previous ssid and password
                     self.wifi_credentials.ssid.clear();
                     self.wifi_credentials.password.clear();
                 }
