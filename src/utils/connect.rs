@@ -3,6 +3,28 @@ use crate::apps::handlers::flags::Flags;
 use crate::apps::handlers::status::Status;
 use std::process::{Command, ExitStatus};
 
+pub fn connect_to_saved_network(ssid: &str) -> Status {
+    let output = Command::new("nmcli")
+        .args(["dev", "wifi", "connect", ssid])
+        .output();
+    match output {
+        Ok(output) => {
+            let status = output.status;
+            if status.success() {
+                let stdout = format!("Successfully connected to '{}'", ssid);
+                Status::new(stdout.to_string(), status)
+            } else {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                Status::new(stderr.to_string(), status)
+            }
+        }
+        Err(e) => Status::new(
+            format!("Failed to execute nmcli: {}", e),
+            ExitStatus::default(),
+        ),
+    }
+}
+
 pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
     let WifiInputState {
         flags: Flags { is_hidden, .. },
