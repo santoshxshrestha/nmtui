@@ -35,12 +35,7 @@ pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
         ..
     } = wifi_creadentials;
 
-    let output = if password.is_empty() {
-        // connecting to the open network
-        Command::new("nmcli")
-            .args(["dev", "wifi", "connect", ssid])
-            .output()
-    } else if *is_hidden {
+    let output = if *is_hidden {
         // connecting to the hidden network
         Command::new("nmcli")
             .args([

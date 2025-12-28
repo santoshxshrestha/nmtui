@@ -50,24 +50,33 @@ impl App {
             Ok(wifi_list) => {
                 // if the selected network is already in use, do nothing
                 if wifi_list[self.selected].in_use {
-                } else if wifi_list[self.selected].security == "--" {
-                    self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
-                    self.wifi_credentials.password.clear();
-                } else if wifi_list[self.selected].ssid == "Connect to Hidden network" {
+                }
+                // if the network is unsecured, connect directly so logic will be similar to saved network
+                else if wifi_list[self.selected].security == "Unsecured" {
+                    let status = connect_to_saved_network(&wifi_list[self.selected].ssid);
+                    self.wifi_credentials.status = status;
+                    self.wifi_credentials.flags.show_status_popup = true;
+                }
+                // if the selected network is hidden network option
+                // the show status popup will be handled by the password input listener
+                else if wifi_list[self.selected].ssid == "Connect to Hidden network" {
                     self.wifi_credentials.flags.is_hidden = true;
                     self.wifi_credentials.flags.show_ssid_popup = true;
-
                     // if the wifi is hidden, then the ssid should be entered manually and the
                     // passoword popupo should be shown by the listner of the enter of the in the
                     // ssid input
                     self.wifi_credentials.flags.show_password_popup = false;
                     self.wifi_credentials.ssid.clear();
                     self.wifi_credentials.password.clear();
-                } else if wifi_list[self.selected].is_saved {
+                }
+                // if the network is saved, connect directly
+                else if wifi_list[self.selected].is_saved {
                     let status = connect_to_saved_network(&wifi_list[self.selected].ssid);
                     self.wifi_credentials.status = status;
                     self.wifi_credentials.flags.show_status_popup = true;
-                } else {
+                }
+                // else show the password popup
+                else {
                     self.wifi_credentials.flags.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
