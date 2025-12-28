@@ -11,6 +11,21 @@ impl App {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
+                    code: KeyCode::Char('h'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
+
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('?'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
                     ..

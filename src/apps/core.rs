@@ -8,6 +8,7 @@ use crate::utils::scan::scan_networks;
 use ratatui::Frame;
 use std::sync::{Arc, Mutex};
 mod delete_handler;
+mod help_handlers;
 
 #[derive(Debug)]
 pub struct App {
@@ -16,6 +17,7 @@ pub struct App {
     selected: usize,
     app_state: AppState,
     show_delete_confirmation: bool,
+    show_help: bool,
 }
 
 impl Default for App {
@@ -28,6 +30,7 @@ impl Default for App {
             selected: 0,
             app_state: AppState::default(),
             show_delete_confirmation: false,
+            show_help: false,
         }
     }
 }

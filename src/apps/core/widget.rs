@@ -15,8 +15,21 @@ use ratatui::{
 use std::io;
 
 const INFO_TEXT: [&str; 2] = [
-    "(Esc) quit | (Ctrl+C) quit | (Ctrl+R) scan for networks ",
-    "(Enter|o) connect to network | (↑|k) move up | (↓|j) move down",
+    "[Esc] quit | (Ctrl+R) scan for networks | (h) help ",
+    "(Enter) connect to network | (↑) move up | (↓) move down",
+];
+
+const HELP_TEST: [&str; 10] = [
+    "[Esc] quit",
+    "(Ctrl+c) force quit",
+    "(Ctrl+R) scan for networks",
+    "(Enter) connect to network",
+    "(o) connect to network",
+    "(d) delete saved network",
+    "(↑|k) move up",
+    "(↓|j) move down",
+    "(h) help",
+    "(?) toggle this help menu",
 ];
 
 impl Widget for &App {
@@ -80,6 +93,29 @@ impl Widget for &App {
         table_state.select(Some(self.selected));
 
         table.render(area, buf);
+        if self.show_help {
+            Clear.render(area, buf);
+            let help_block = Block::default()
+                .title("Help Menu")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+
+            let help_area = Rect {
+                x: area.x + area.width / 6,
+                y: area.y + area.height / 6,
+                width: area.width * 2 / 3,
+                height: area.height * 2 / 3,
+            };
+
+            let help_paragraph = Paragraph::new(HELP_TEST.join("\n"))
+                .block(help_block)
+                .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
+
+            help_paragraph.render(help_area, buf);
+        }
 
         if self.show_delete_confirmation {
             Clear.render(area, buf);
