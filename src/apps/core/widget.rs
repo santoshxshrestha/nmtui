@@ -1,4 +1,5 @@
 use super::App;
+
 use crossterm::cursor::DisableBlinking;
 use crossterm::cursor::EnableBlinking;
 use crossterm::cursor::{self, MoveTo};

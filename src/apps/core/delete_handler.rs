@@ -1,4 +1,7 @@
 use super::App;
+use crate::utils::delete_connection::delete_connection;
+use crate::utils::scan::scan_networks;
+
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
@@ -56,5 +59,9 @@ impl App {
         };
         Ok(())
     }
-    pub fn delete_connection(&mut self) {}
+    pub fn delete_connection(&mut self) {
+        delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
+        self.show_delete_confirmation = false;
+        scan_networks(self.wifi_list.clone());
+    }
 }

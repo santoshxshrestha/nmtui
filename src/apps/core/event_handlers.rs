@@ -1,6 +1,6 @@
 use super::App;
-use crate::utils::delete_connection::delete_connection;
 use crate::utils::scan::scan_networks;
+
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
@@ -81,11 +81,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    // Todo: need to handle this safely with a conformation prompt before deleting
-                    // the connection out there
-                    let ssid = self.wifi_list.lock().unwrap()[self.selected].ssid.clone();
-                    delete_connection(ssid);
-                    scan_networks(self.wifi_list.clone());
+                    self.show_delete_confirmation = true;
                 }
                 _ => {}
             };
