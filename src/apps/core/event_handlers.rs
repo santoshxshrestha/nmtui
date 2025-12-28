@@ -1,5 +1,6 @@
 use super::App;
-use crate::utils::scan::scan_networks;
+use crate::utils::delete_connection::delete_connection;
+use crate::utils::scan::{self, scan_networks};
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
@@ -74,6 +75,15 @@ impl App {
                     ..
                 }) => {
                     self.update_selected_network(1);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('d'),
+                    kind: Press,
+                    ..
+                }) => {
+                    let ssid = self.wifi_list.lock().unwrap()[self.selected].ssid.clone();
+                    delete_connection(ssid);
+                    scan_networks(self.wifi_list.clone());
                 }
                 _ => {}
             };
