@@ -24,5 +24,5 @@ pub fn saved_connections() -> Vec<String> {
             ssids.push(ssid);
         }
     }
-    return ssids;
+    ssids
 }

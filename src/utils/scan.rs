@@ -29,11 +29,11 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
 
             let security = parts
                 .next()
-                .and_then(|s| {
+                .map(|s| {
                     if s.is_empty() {
-                        Some("Unsecured".to_string())
+                        "Unsecured".to_string()
                     } else {
-                        Some(s.to_string())
+                        s.to_string()
                     }
                 })
                 .unwrap_or("?".to_string());
