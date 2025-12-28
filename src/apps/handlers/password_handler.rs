@@ -3,8 +3,9 @@ use super::utils::{delete_char, enter_char, move_cursor_right};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
 use std::io;
 use std::time::Duration;
+
 impl WifiInputState {
-    pub fn handle_ssid_input(&mut self) -> io::Result<()> {
+    pub fn handle_password_input(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
@@ -19,42 +20,45 @@ impl WifiInputState {
                     kind: Press,
                     ..
                 }) => {
-                    move_cursor_right(&self.ssid, &mut self.cursor_pos);
+                    move_cursor_right(&self.password, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
                     ..
                 }) => {
-                    self.flags.show_ssid_popup = false;
+                    // if we go back from password input, we should show the ssid popup again
+                    // with the cursor at the end of the ssid
+                    self.flags.show_password_popup = false;
+                    if self.flags.is_hidden {
+                        self.flags.show_ssid_popup = true;
+                    }
+                    self.cursor_pos = self.ssid.chars().count() as u16;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
                     kind: Press,
                     ..
                 }) => {
-                    enter_char(&mut self.ssid, c, &self.cursor_pos);
-                    move_cursor_right(&self.ssid, &mut self.cursor_pos);
+                    enter_char(&mut self.password, c, &self.cursor_pos);
+                    move_cursor_right(&self.password, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
                     kind: Press,
                     ..
                 }) => {
-                    delete_char(&mut self.ssid, &mut self.cursor_pos);
-                    self.move_cursor_left();
+                    delete_char(&mut self.password, &mut self.cursor_pos);
+                    self.move_cursor_left()
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
                     kind: Press,
                     ..
                 }) => {
-                    // when ssid is entered, we should show the password popup
-                    // but if the user had entered a password before, we should keep it
-                    // so that the user can go back and forth without losing the password
-                    self.flags.show_ssid_popup = false;
-                    self.flags.show_password_popup = true;
-                    self.cursor_pos = self.password.chars().count() as u16;
+                    if self.password.is_empty() || self.password.chars().count() >= 8 {
+                        self.prepare_to_connect();
+                    }
                 }
                 _ => {}
             };

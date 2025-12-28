@@ -26,7 +26,18 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
 
             let in_use = parts.next() == Some("*");
             let ssid = parts.next().unwrap_or("").to_string();
-            let security = parts.next().unwrap_or("--").to_string();
+
+            let security = parts
+                .next()
+                .and_then(|s| {
+                    if s.is_empty() {
+                        Some("Unsecured".to_string())
+                    } else {
+                        Some(s.to_string())
+                    }
+                })
+                .unwrap_or("?".to_string());
+
             let is_saved = saved_networks.contains(&ssid);
 
             if !ssid.is_empty() {
