@@ -1,5 +1,6 @@
 use super::App;
 use crate::utils::scan::scan_networks;
+
 use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
@@ -9,6 +10,21 @@ impl App {
     pub fn handle_events(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('h'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
+
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('?'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
                     kind: Press,
@@ -74,6 +90,13 @@ impl App {
                     ..
                 }) => {
                     self.update_selected_network(1);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('d'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_delete_confirmation = true;
                 }
                 _ => {}
             };
