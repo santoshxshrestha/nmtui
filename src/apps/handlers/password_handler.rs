@@ -30,7 +30,9 @@ impl WifiInputState {
                     // if we go back from password input, we should show the ssid popup again
                     // with the cursor at the end of the ssid
                     self.flags.show_password_popup = false;
-                    self.flags.show_ssid_popup = true;
+                    if self.flags.is_hidden {
+                        self.flags.show_ssid_popup = true;
+                    }
                     self.cursor_pos = self.ssid.chars().count() as u16;
                 }
                 Event::Key(KeyEvent {
