@@ -11,6 +11,5 @@ pub fn delete_connection(ssid: String) {
         if !output.status.success() {
             return;
         }
-        // let stdout = String::from_utf8_lossy(&output.stdout);
     });
 }
