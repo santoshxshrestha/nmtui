@@ -48,6 +48,7 @@ impl App {
     fn prepare_to_connect(&mut self) {
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
+                // if the selected network is already in use, do nothing
                 if wifi_list[self.selected].in_use {
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();

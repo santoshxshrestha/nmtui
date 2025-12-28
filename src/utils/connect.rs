@@ -3,6 +3,7 @@ use crate::apps::handlers::flags::Flags;
 use crate::apps::handlers::status::Status;
 use std::process::{Command, ExitStatus};
 
+// Connect to a saved network without password
 pub fn connect_to_saved_network(ssid: &str) -> Status {
     let output = Command::new("nmcli")
         .args(["dev", "wifi", "connect", ssid])
@@ -25,6 +26,7 @@ pub fn connect_to_saved_network(ssid: &str) -> Status {
     }
 }
 
+// Connect to a network with given credentials
 pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
     let WifiInputState {
         flags: Flags { is_hidden, .. },
@@ -34,7 +36,7 @@ pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
     } = wifi_creadentials;
 
     let output = if password.is_empty() {
-        // connecting to the open network or the network that was already saved
+        // connecting to the open network
         Command::new("nmcli")
             .args(["dev", "wifi", "connect", ssid])
             .output()
