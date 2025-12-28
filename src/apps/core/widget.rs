@@ -117,6 +117,7 @@ impl Widget for &App {
             help_paragraph.render(help_area, buf);
         }
 
+        // handle the render of the delete confirmation popup
         if self.show_delete_confirmation {
             Clear.render(area, buf);
             let popup_block = Block::default()
@@ -176,6 +177,7 @@ impl Widget for &App {
             ssid_paragraph.render(popup_area, buf);
         }
 
+        // handle the render of the password input popup
         if self.wifi_credentials.flags.show_password_popup {
             Clear.render(area, buf);
             let popup_block = Block::default()
@@ -183,7 +185,7 @@ impl Widget for &App {
                 .borders(ratatui::widgets::Borders::ALL)
                 .border_type(ratatui::widgets::BorderType::Rounded)
                 .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta))
-                .title_bottom("If the network is open | already saved, just press Enter");
+                .title_bottom("If the network is open, just press Enter");
 
             let popup_area = Rect {
                 x: area.x + area.width / 4,
@@ -209,6 +211,7 @@ impl Widget for &App {
             password_paragraph.render(popup_area, buf);
         }
 
+        // handle the render of the status popup
         if self.wifi_credentials.flags.show_status_popup {
             Clear.render(area, buf);
             let status_block = Block::default()

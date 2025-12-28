@@ -4,6 +4,7 @@ mod widget;
 use crate::AppState;
 use crate::WifiNetwork;
 use crate::apps::handlers::WifiInputState;
+use crate::utils::connect::connect_to_saved_network;
 use crate::utils::scan::scan_networks;
 use ratatui::Frame;
 use std::sync::{Arc, Mutex};
@@ -47,6 +48,7 @@ impl App {
     fn prepare_to_connect(&mut self) {
         match self.wifi_list.try_lock() {
             Ok(wifi_list) => {
+                // if the selected network is already in use, do nothing
                 if wifi_list[self.selected].in_use {
                 } else if wifi_list[self.selected].security == "--" {
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
@@ -61,6 +63,10 @@ impl App {
                     self.wifi_credentials.flags.show_password_popup = false;
                     self.wifi_credentials.ssid.clear();
                     self.wifi_credentials.password.clear();
+                } else if wifi_list[self.selected].is_saved {
+                    let status = connect_to_saved_network(&wifi_list[self.selected].ssid);
+                    self.wifi_credentials.status = status;
+                    self.wifi_credentials.flags.show_status_popup = true;
                 } else {
                     self.wifi_credentials.flags.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
