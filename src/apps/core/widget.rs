@@ -80,6 +80,32 @@ impl Widget for &App {
 
         table.render(area, buf);
 
+        if self.show_delete_confirmation {
+            Clear.render(area, buf);
+            let popup_block = Block::default()
+                .title("Confirm Deletion")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta))
+                .title_bottom("Are you sure you want to delete this saved network? (y/n)");
+
+            let popup_area = Rect {
+                x: area.x + area.width / 4,
+                y: area.y + area.height / 4,
+                width: area.width / 2,
+                height: area.height / 10,
+            };
+
+            let confirmation_paragraph =
+                Paragraph::new("Press 'y' to confirm deletion or 'n' to cancel.")
+                    .block(popup_block)
+                    .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
+
+            confirmation_paragraph.render(popup_area, buf);
+        }
+
         // handle the render of the ssid input popup for hidden networks
         if self.wifi_credentials.flags.is_hidden {
             Clear.render(area, buf);
