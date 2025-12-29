@@ -1,4 +1,3 @@
-#![allow(unused)]
 use super::App;
 
 use crossterm::event::poll;
@@ -110,11 +109,6 @@ impl App {
                 }) => {
                     self.update_selected_saved_network(-1);
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('d'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {}
                 _ => {}
             };
         }
