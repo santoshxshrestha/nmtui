@@ -103,7 +103,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_saved = true;
+                    self.open_saved_list();
                 }
                 _ => {}
             };
