@@ -88,7 +88,7 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    // this is the function that deleted the connection from the main lists too
+                    // this will evaluate to run the delete confirmation dialog from the core ui
                     self.show_delete_confirmation = true;
                 }
 
