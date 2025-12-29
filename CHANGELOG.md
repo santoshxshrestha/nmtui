@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 - code refactoring and cleanup
 - force full modularization of codebase
 
-## [0.1.0] - 2025-12-21 (init date)
+## 0.1.0 - 2025-12-21 (init date)
 
 ### Added
 
@@ -28,4 +28,3 @@ All notable changes to this project will be documented in this file.
 
 [Unreleased]: https://github.com/santoshxshrestha/nmtui/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v1.0.0
-[0.1.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v0.1.0
