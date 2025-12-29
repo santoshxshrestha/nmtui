@@ -58,6 +58,30 @@ impl SavedConnections {
 }
 
 impl App {
+    /// Handle keyboard input when the saved-connections UI is active and update the application state.
+    ///
+    /// Recognizes key presses and performs the following actions:
+    /// - 'q' or Esc: close the saved-connections view
+    /// - Ctrl+C: exit the application
+    /// - 'd': show the delete-confirmation dialog
+    /// - 'j' or Down: advance the saved-connection selection by one
+    /// - 'k' or Up: move the saved-connection selection back by one
+    /// - 'h' or '?': show the help view
+    /// - Ctrl+R: refresh the saved connections list by re-fetching saved connections
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` on success, or an `io::Error` if polling or reading terminal input fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::io;
+    /// # // `App` must be constructed according to the surrounding codebase.
+    /// # let mut app = App::default();
+    /// // Process any pending saved-list input once.
+    /// let _ = app.handle_saved();
+    /// ```
     pub fn handle_saved(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
@@ -88,7 +112,7 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    // this is the function that deleted the connection from the main lists too
+                    // this will evaluate to run the delete confirmation dialog from the core ui
                     self.show_delete_confirmation = true;
                 }
 
@@ -133,6 +157,14 @@ impl App {
                     ..
                 }) => {
                     self.show_help = true;
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('r'),
+                    kind: event::KeyEventKind::Press,
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => {
+                    self.saved_connection.fetch_saved_connections();
                 }
                 _ => {}
             };
