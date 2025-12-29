@@ -134,6 +134,14 @@ impl App {
                 }) => {
                     self.show_help = true;
                 }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('r'),
+                    kind: event::KeyEventKind::Press,
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => {
+                    self.saved_connection.fetch_saved_connections();
+                }
                 _ => {}
             };
         }
