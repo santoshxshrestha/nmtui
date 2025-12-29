@@ -15,6 +15,7 @@ pub struct Connections {
 #[derive(Debug, Default)]
 pub struct SavedConnections {
     pub connections: Vec<Connections>,
+    pub selected_index: usize,
 }
 
 impl SavedConnections {
@@ -80,10 +81,53 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {}
+
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('j'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.update_selected_saved_network(1);
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Down,
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.update_selected_saved_network(1);
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('k'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.update_selected_saved_network(-1);
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Up,
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.update_selected_saved_network(1);
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('d'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {}
                 _ => {}
             };
         }
         Ok(())
+    }
+    pub fn update_selected_saved_network(&mut self, direction: isize) {
+        let len = self.saved_connection.connections.len();
+        // if there is some content in the saved list
+        if len > 0 {
+            self.saved_connection.selected_index =
+                ((self.saved_connection.selected_index as isize + direction)
+                    .rem_euclid(len as isize)) as usize;
+        }
     }
     pub fn open_saved_list(&mut self) {
         self.saved_connection.fetch_saved_connections();
