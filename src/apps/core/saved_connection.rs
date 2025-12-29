@@ -39,24 +39,12 @@ impl SavedConnections {
             let mut parts = line.splitn(3, ':');
             let ssid = parts.next().unwrap_or("").to_string();
 
-            // if the connection type is empty, it means its unsecured
-            let connection_type = parts
-                .next()
-                .map(|s| {
-                    if s.is_empty() {
-                        "Unsecured".to_string()
-                    } else {
-                        s.to_string()
-                    }
-                })
-                .unwrap_or("".to_string());
+            // this is the connection type not the security type
+            let connection_type = parts.next().unwrap_or("").to_string();
 
             let last_used = parts.next().unwrap_or("").to_string();
 
-            if !ssid.is_empty()
-                && !connection_type.is_empty()
-                && connection_type == "802-11-wireless"
-            {
+            if !ssid.is_empty() && connection_type == "802-11-wireless" {
                 connections.push(Connections { ssid, last_used });
             }
         }
