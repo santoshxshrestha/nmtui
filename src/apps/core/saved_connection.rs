@@ -127,6 +127,13 @@ impl App {
                 }) => {
                     self.show_help = true;
                 }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('?'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
                 _ => {}
             };
         }
