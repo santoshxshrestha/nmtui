@@ -138,7 +138,7 @@ impl Widget for &App {
             .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
             let mut saved_table_state = TableState::default();
-            saved_table_state.select(Some(self.selected));
+            saved_table_state.select(Some(self.saved_connection.selected_index));
 
             saved_table.render(saved_area, buf);
         }
