@@ -42,7 +42,14 @@ impl SavedConnections {
             // this is the connection type not the security type
             let connection_type = parts.next().unwrap_or("").to_string();
 
-            let last_used = parts.next().unwrap_or("").to_string();
+            // let last_used = parts.next().unwrap_or("").to_string();
+
+            let last_used = parts
+                .next()
+                .unwrap_or("")
+                .chars()
+                .filter(|&c| c != '\\')
+                .collect();
 
             if !ssid.is_empty() && connection_type == "802-11-wireless" {
                 connections.push(Connections { ssid, last_used });
