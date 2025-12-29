@@ -26,5 +26,6 @@ All notable changes to this project will be documented in this file.
 - Initial project structure
 - Working state with some feat like network scanning
 
-[Unreleased]: https://github.com/santoshxshrestha/rmxt/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/santoshxshrestha/rmxt/releases/tag/v0.1.0
+[Unreleased]: https://github.com/santoshxshrestha/nmtui/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v1.0.0
+[0.1.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v0.1.0
