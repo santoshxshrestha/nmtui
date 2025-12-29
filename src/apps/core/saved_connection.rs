@@ -42,7 +42,12 @@ impl SavedConnections {
             // this is the connection type not the security type
             let connection_type = parts.next().unwrap_or("").to_string();
 
-            let last_used = parts.next().unwrap_or("").to_string();
+            let last_used = parts
+                .next()
+                .unwrap_or("")
+                .chars()
+                .filter(|&c| c != '\\')
+                .collect();
 
             if !ssid.is_empty() && connection_type == "802-11-wireless" {
                 connections.push(Connections { ssid, last_used });
@@ -57,6 +62,13 @@ impl App {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('q'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.close_saved_list();
+                }
+                Event::Key(KeyEvent {
                     code: event::KeyCode::Esc,
                     kind: event::KeyEventKind::Press,
                     ..
@@ -64,10 +76,21 @@ impl App {
                     self.close_saved_list();
                 }
                 Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('c'),
+                    kind: event::KeyEventKind::Press,
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => {
+                    self.exit();
+                }
+                Event::Key(KeyEvent {
                     code: event::KeyCode::Char('d'),
                     kind: event::KeyEventKind::Press,
                     ..
-                }) => {}
+                }) => {
+                    // this is the function that deleted the connection from the main lists too
+                    self.show_delete_confirmation = true;
+                }
 
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('j'),
@@ -96,6 +119,20 @@ impl App {
                     ..
                 }) => {
                     self.update_selected_saved_network(-1);
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('h'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('?'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.show_help = true;
                 }
                 _ => {}
             };
