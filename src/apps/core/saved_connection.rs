@@ -108,7 +108,7 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    self.update_selected_saved_network(1);
+                    self.update_selected_saved_network(-1);
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('d'),
