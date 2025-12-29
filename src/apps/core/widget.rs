@@ -93,6 +93,57 @@ impl Widget for &App {
         table_state.select(Some(self.selected));
 
         table.render(area, buf);
+        // handle the render of the saved connections list
+        if self.show_saved {
+            Clear.render(area, buf);
+            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
+            let saved_block = Block::default()
+                .title("Saved Connections")
+                .borders(ratatui::widgets::Borders::ALL)
+                .border_type(ratatui::widgets::BorderType::Rounded)
+                .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::Magenta));
+
+            let saved_area = Rect {
+                x: area.x + area.width / 6,
+                y: area.y + area.height / 6,
+                width: area.width * 2 / 3,
+                height: area.height * 2 / 3,
+            };
+
+            let mut saved_rows = Vec::new();
+            for (i, connection) in self.saved_connection.connections.iter().enumerate() {
+                let mut row = Row::new(vec![connection.ssid.clone(), connection.last_used.clone()]);
+                if i == self.saved_connection.selected_index {
+                    row = row.style(
+                        ratatui::style::Style::default()
+                            .fg(ratatui::style::Color::Black)
+                            .bg(ratatui::style::Color::White),
+                    );
+                }
+                saved_rows.push(row);
+            }
+
+            let saved_header = Row::new(vec!["SSID", "LAST USED"]).style(
+                ratatui::style::Style::default()
+                    .fg(ratatui::style::Color::Yellow)
+                    .bold(),
+            );
+
+            let saved_table = Table::new(
+                saved_rows,
+                [Constraint::Percentage(70), Constraint::Percentage(30)],
+            )
+            .header(saved_header)
+            .block(saved_block)
+            .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
+
+            let mut saved_table_state = TableState::default();
+            saved_table_state.select(Some(self.saved_connection.selected_index));
+
+            saved_table.render(saved_area, buf);
+        }
+
+        // handle the render of the help menu
         if self.show_help {
             Clear.render(area, buf);
             let help_block = Block::default()
