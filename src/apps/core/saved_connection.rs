@@ -120,6 +120,13 @@ impl App {
                 }) => {
                     self.update_selected_saved_network(-1);
                 }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('h'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.show_help = true;
+                }
                 _ => {}
             };
         }
