@@ -19,7 +19,7 @@ const INFO_TEXT: [&str; 2] = [
     "(Enter) connect to network | (↑) move up | (↓) move down",
 ];
 
-const HELP_TEST: [&str; 10] = [
+const HELP_TEST: [&str; 11] = [
     "[Esc] quit",
     "(Ctrl+c) force quit",
     "(Ctrl+R) scan for networks",
@@ -29,7 +29,8 @@ const HELP_TEST: [&str; 10] = [
     "(↑|k) move up",
     "(↓|j) move down",
     "(h) help",
-    "(?) toggle this help menu",
+    "(?) help",
+    "(s) view saved networks",
 ];
 
 impl Widget for &App {

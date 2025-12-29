@@ -47,7 +47,22 @@ impl App {
                     self.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    kind: Press,
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => {
+                    self.exit();
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Esc,
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_delete_confirmation = false;
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('q'),
                     kind: Press,
                     ..
                 }) => {

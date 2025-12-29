@@ -62,11 +62,26 @@ impl App {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('q'),
+                    kind: event::KeyEventKind::Press,
+                    ..
+                }) => {
+                    self.close_saved_list();
+                }
+                Event::Key(KeyEvent {
                     code: event::KeyCode::Esc,
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_saved_list();
+                }
+                Event::Key(KeyEvent {
+                    code: event::KeyCode::Char('c'),
+                    kind: event::KeyEventKind::Press,
+                    modifiers: event::KeyModifiers::CONTROL,
+                    ..
+                }) => {
+                    self.exit();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('d'),

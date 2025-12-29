@@ -16,7 +16,8 @@ impl App {
             if self.show_help {
                 self.handle_help()?;
             }
-            // to handle the delete confirmation popup
+            // to handle the delete confirmation popup this is at top becuase it is displayed
+            // over other popups
             else if self.show_delete_confirmation {
                 self.handle_delete_confirmation()?;
             }
