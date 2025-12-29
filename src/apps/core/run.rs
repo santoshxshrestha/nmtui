@@ -8,6 +8,10 @@ impl App {
     ) -> Result<(), Box<dyn std::error::Error>> {
         while !self.app_state.exit {
             terminal.draw(|frame| self.draw(frame))?;
+            // NOTE: here placement is is key because we want to prioritize which popup gets handled first
+            // If  there is a preceeding popup shown, we want to handle the one that is on top
+            // priority with out handling the events of the other one
+
             // to handle the help popup
             if self.show_help {
                 self.handle_help()?;
