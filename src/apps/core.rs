@@ -1,9 +1,10 @@
 mod event_handlers;
 mod run;
-mod saved_handler;
+mod saved_connection;
 mod widget;
 use crate::AppState;
 use crate::WifiNetwork;
+use crate::apps::core::saved_connection::SavedConnections;
 use crate::apps::handlers::WifiInputState;
 use crate::utils::connect::connect_to_saved_network;
 use crate::utils::scan::scan_networks;
@@ -21,6 +22,7 @@ pub struct App {
     show_delete_confirmation: bool,
     show_saved: bool,
     show_help: bool,
+    saved_connection: SavedConnections,
 }
 
 impl Default for App {
@@ -35,6 +37,7 @@ impl Default for App {
             show_delete_confirmation: false,
             show_help: false,
             show_saved: false,
+            saved_connection: SavedConnections::default(),
         }
     }
 }
