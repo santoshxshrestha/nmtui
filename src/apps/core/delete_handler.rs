@@ -60,7 +60,15 @@ impl App {
         Ok(())
     }
     pub fn delete_connection(&mut self) {
-        delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
+        if self.show_saved {
+            delete_connection(
+                self.saved_connection.connections[self.selected]
+                    .ssid
+                    .clone(),
+            );
+        } else {
+            delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
+        }
         self.show_delete_confirmation = false;
         scan_networks(self.wifi_list.clone());
     }

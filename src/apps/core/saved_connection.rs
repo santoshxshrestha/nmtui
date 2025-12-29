@@ -42,8 +42,6 @@ impl SavedConnections {
             // this is the connection type not the security type
             let connection_type = parts.next().unwrap_or("").to_string();
 
-            // let last_used = parts.next().unwrap_or("").to_string();
-
             let last_used = parts
                 .next()
                 .unwrap_or("")
@@ -74,7 +72,10 @@ impl App {
                     code: event::KeyCode::Char('d'),
                     kind: event::KeyEventKind::Press,
                     ..
-                }) => {}
+                }) => {
+                    // this is the function that deleted the connection from the main lists too
+                    self.show_delete_confirmation = true;
+                }
 
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('j'),
