@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - help menu
 - list for saved connections,
 - delete connection confirmation popup,
-- listners for all the popups/menus
+- listeners for all the popups/menus
 
 ### Changed
 
