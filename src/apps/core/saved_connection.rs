@@ -73,7 +73,7 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    self.show_saved = false;
+                    self.close_saved_list();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('d'),
