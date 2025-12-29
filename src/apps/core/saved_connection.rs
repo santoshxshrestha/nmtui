@@ -53,10 +53,7 @@ impl SavedConnections {
 
             let last_used = parts.next().unwrap_or("").to_string();
 
-            if !ssid.is_empty()
-                && !connection_type.is_empty()
-                && connection_type == "802-11-wireless"
-            {
+            if !ssid.is_empty() && connection_type == "802-11-wireless" {
                 connections.push(Connections { ssid, last_used });
             }
         }
