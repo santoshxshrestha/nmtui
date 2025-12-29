@@ -42,6 +42,15 @@ impl WifiInputState {
                     self.status.status_code = ExitStatus::default();
                 }
                 Event::Key(KeyEvent {
+                    code: KeyCode::Char('q'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.flags.show_status_popup = false;
+                    self.status.status_message.clear();
+                    self.status.status_code = ExitStatus::default();
+                }
+                Event::Key(KeyEvent {
                     code: KeyCode::Enter,
                     kind: Press,
                     ..
