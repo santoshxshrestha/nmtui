@@ -1,5 +1,6 @@
 mod event_handlers;
 mod run;
+mod saved_handler;
 mod widget;
 use crate::AppState;
 use crate::WifiNetwork;
@@ -18,6 +19,7 @@ pub struct App {
     selected: usize,
     app_state: AppState,
     show_delete_confirmation: bool,
+    show_saved: bool,
     show_help: bool,
 }
 
@@ -32,6 +34,7 @@ impl Default for App {
             app_state: AppState::default(),
             show_delete_confirmation: false,
             show_help: false,
+            show_saved: false,
         }
     }
 }

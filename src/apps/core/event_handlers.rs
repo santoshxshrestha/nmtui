@@ -98,6 +98,13 @@ impl App {
                 }) => {
                     self.show_delete_confirmation = true;
                 }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('s'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.show_saved = true;
+                }
                 _ => {}
             };
         }
