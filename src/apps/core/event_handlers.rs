@@ -1,4 +1,5 @@
 use super::App;
+use crate::utils::disconnect_connection::disconnect_connected_network;
 use crate::utils::scan::scan_networks;
 
 use crossterm::event::KeyEventKind::Press;
@@ -104,6 +105,13 @@ impl App {
                     ..
                 }) => {
                     self.open_saved_list();
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('x'),
+                    kind: Press,
+                    ..
+                }) => {
+                    disconnect_connected_network(self.wifi_list.clone());
                 }
                 _ => {}
             };
