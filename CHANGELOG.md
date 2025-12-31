@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Listner for disconnecting the current connection
+- Helper function to disconnect from the current connection
+- Utility function that will actually disconnect from the current connection
+
 ## [1.0.0] - 2025-12-30
 
 ### Added
