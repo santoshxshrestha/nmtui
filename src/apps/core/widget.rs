@@ -34,6 +34,23 @@ const HELP_TEST: [&str; 11] = [
 ];
 
 impl Widget for &App {
+    /// Render the application's terminal UI into the provided drawing area buffer.
+    ///
+    /// This draws the main network table and, depending on internal flags and state,
+    /// overlays the saved-connections list, help menu, delete-confirmation popup,
+    /// hidden-SSID input popup, password input popup, and status popup. Cursor
+    /// visibility and blinking are adjusted as needed for input popups.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ratatui::buffer::Buffer;
+    /// use ratatui::layout::Rect;
+    ///
+    /// let app = App::new(); // construct your App
+    /// let mut buf = Buffer::empty(Rect::new(0, 0, 80, 24));
+    /// app.render(Rect::new(0, 0, 80, 24), &mut buf);
+    /// ```
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from("NMTUI").bold().italic().centered();
 

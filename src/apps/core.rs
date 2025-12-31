@@ -26,6 +26,18 @@ pub struct App {
 }
 
 impl Default for App {
+    /// Constructs a new `App` with default field values and begins an initial Wi‑Fi scan.
+    ///
+    /// All fields are initialized using their `Default` implementations. The `wifi_list` is created
+    /// as an empty, shared, thread-safe vector and an initial network scan is triggered to populate it.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let app = App::default();
+    /// assert_eq!(app.selected, 0);
+    /// assert!(app.wifi_list.lock().unwrap().is_empty());
+    /// ```
     fn default() -> Self {
         let wifi_list = Arc::new(Mutex::new(Vec::new()));
         scan_networks(wifi_list.clone());

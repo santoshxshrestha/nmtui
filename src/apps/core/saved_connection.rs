@@ -171,6 +171,23 @@ impl App {
         }
         Ok(())
     }
+    /// Move the selected saved network index by `direction`, wrapping around the list bounds.
+    ///
+    /// If the saved-connections list is empty, the selection is unchanged.
+    ///
+    /// # Parameters
+    ///
+    /// - `direction`: Signed offset to apply to the current `selected_index`. A positive value moves the selection forward, a negative value moves it backward. The resulting index wraps within `[0, len - 1]`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// // wrap-forward example: index 2 in a list of length 3 + direction 1 -> 0
+    /// let idx = 2usize;
+    /// let len = 3usize;
+    /// let new = ((idx as isize + 1).rem_euclid(len as isize)) as usize;
+    /// assert_eq!(new, 0);
+    /// ```
     pub fn update_selected_saved_network(&mut self, direction: isize) {
         let len = self.saved_connection.connections.len();
         // if there is some content in the saved list
@@ -180,11 +197,33 @@ impl App {
                     .rem_euclid(len as isize)) as usize;
         }
     }
+    /// Opens the saved-connections view.
+    ///
+    /// This refreshes the stored list of saved Wi‑Fi connections and makes the saved-connections UI visible.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// // Construct your application, refresh saved connections, and show the saved list:
+    /// let mut app = App::new();
+    /// app.open_saved_list();
+    /// assert!(app.flags.show_saved);
+    /// ```
     pub fn open_saved_list(&mut self) {
         self.saved_connection.fetch_saved_connections();
         self.flags.show_saved = true;
     }
 
+    /// Hides the saved-connections view in the application's UI.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let mut app = App::default();
+    /// app.flags.show_saved = true;
+    /// app.close_saved_list();
+    /// assert!(!app.flags.show_saved);
+    /// ```
     pub fn close_saved_list(&mut self) {
         self.flags.show_saved = false;
     }

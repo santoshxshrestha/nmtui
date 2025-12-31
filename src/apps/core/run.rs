@@ -2,6 +2,22 @@ use super::App;
 use ratatui::DefaultTerminal;
 
 impl App {
+    /// Run the application's main event loop until the app requests exit.
+    ///
+    /// Renders the UI each iteration and dispatches input to the highest-priority active popup or, when no popup is active, to the main event handler. The loop continues until `self.app_state.exit` is true or an error occurs.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` on normal termination, or an error if a rendering or handler callback fails.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// // assume `App` and `DefaultTerminal` are available and constructible
+    /// let mut app = App::default();
+    /// let mut terminal = DefaultTerminal::new();
+    /// app.run(&mut terminal).unwrap();
+    /// ```
     pub fn run(
         &mut self,
         terminal: &mut DefaultTerminal,
