@@ -111,7 +111,9 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    disconnect_connected_network(self.wifi_list.clone());
+                    self.wifi_credentials.status =
+                        disconnect_connected_network(self.wifi_list.clone());
+                    self.wifi_credentials.flags.show_status_popup = true;
                 }
                 _ => {}
             };
