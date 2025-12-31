@@ -5,7 +5,7 @@ use std::{
 };
 
 pub fn disconnect_connected_network(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) -> Status {
-    let list = wifi_list.lock().unwrap();
+    let list = wifi_list.lock().expect("WifiNetworks lock poisoned");
 
     for network in list.iter() {
         if network.in_use {
