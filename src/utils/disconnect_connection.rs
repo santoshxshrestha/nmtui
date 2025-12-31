@@ -36,5 +36,5 @@ pub fn disconnect_connected_network(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) -> 
     Status::new(
         "No connected network found".to_string(),
         ExitStatus::default(),
-    );
+    )
 }
