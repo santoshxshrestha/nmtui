@@ -105,6 +105,13 @@ impl App {
                 }) => {
                     self.open_saved_list();
                 }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('x'),
+                    kind: Press,
+                    ..
+                }) => {
+                    self.disconnect();
+                }
                 _ => {}
             };
         }

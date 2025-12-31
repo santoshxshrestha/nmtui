@@ -7,6 +7,7 @@ use crate::WifiNetwork;
 use crate::apps::core::saved_connection::SavedConnections;
 use crate::apps::handlers::WifiInputState;
 use crate::utils::connect::connect_to_saved_network;
+use crate::utils::disconnect_connection::disconnect_connected_network;
 use crate::utils::scan::scan_networks;
 use ratatui::Frame;
 use std::sync::{Arc, Mutex};
@@ -110,5 +111,11 @@ impl App {
                     ((self.selected as isize + direction).rem_euclid(len as isize)) as usize;
             }
         }
+    }
+
+    fn disconnect(&mut self) {
+        self.wifi_credentials.status = disconnect_connected_network(self.wifi_list.clone());
+        self.wifi_credentials.flags.show_status_popup = true;
+        scan_networks(self.wifi_list.clone());
     }
 }
