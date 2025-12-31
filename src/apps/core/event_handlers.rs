@@ -7,6 +7,25 @@ use std::io;
 use std::time::Duration;
 
 impl App {
+    /// Process a single terminal input event if one is available.
+    ///
+    /// Reads a pending crossterm event (non-blocking) and dispatches it to update
+    /// application state or trigger actions (navigation, connect/disconnect, help,
+    /// scan, exit, etc.). If no event is ready the method does nothing.
+    ///
+    /// # Errors
+    ///
+    /// Returns any I/O error produced by the underlying event poll/read operations.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// // Create or obtain a mutable App instance and call the handler once.
+    /// // The real App type may require different construction; this shows the
+    /// // typical usage pattern.
+    /// let mut app = App::default();
+    /// app.handle_events().unwrap();
+    /// ```
     pub fn handle_events(&mut self) -> io::Result<()> {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
@@ -15,7 +34,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
 
                 Event::Key(KeyEvent {
@@ -23,7 +42,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
@@ -96,7 +115,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = true;
+                    self.flags.show_delete_confirmation = true;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('s'),

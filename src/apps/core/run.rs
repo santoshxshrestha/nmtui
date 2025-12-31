@@ -2,6 +2,22 @@ use super::App;
 use ratatui::DefaultTerminal;
 
 impl App {
+    /// Run the application's main event loop until the app requests exit.
+    ///
+    /// Renders the UI each iteration and dispatches input to the highest-priority active popup or, when no popup is active, to the main event handler. The loop continues until `self.app_state.exit` is true or an error occurs.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` on normal termination, or an error if a rendering or handler callback fails.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// // assume `App` and `DefaultTerminal` are available and constructible
+    /// let mut app = App::default();
+    /// let mut terminal = DefaultTerminal::new();
+    /// app.run(&mut terminal).unwrap();
+    /// ```
     pub fn run(
         &mut self,
         terminal: &mut DefaultTerminal,
@@ -13,16 +29,16 @@ impl App {
             // priority with out handling the events of the other one
 
             // to handle the help popup
-            if self.show_help {
+            if self.flags.show_help {
                 self.handle_help()?;
             }
             // to handle the delete confirmation popup this is at top becuase it is displayed
             // over other popups
-            else if self.show_delete_confirmation {
+            else if self.flags.show_delete_confirmation {
                 self.handle_delete_confirmation()?;
             }
             // to handle the saved connections popup
-            else if self.show_saved {
+            else if self.flags.show_saved {
                 self.handle_saved()?;
             }
             // to handle the wifi ssid input popups

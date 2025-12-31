@@ -34,6 +34,23 @@ const HELP_TEST: [&str; 11] = [
 ];
 
 impl Widget for &App {
+    /// Render the application's terminal UI into the provided drawing area buffer.
+    ///
+    /// This draws the main network table and, depending on internal flags and state,
+    /// overlays the saved-connections list, help menu, delete-confirmation popup,
+    /// hidden-SSID input popup, password input popup, and status popup. Cursor
+    /// visibility and blinking are adjusted as needed for input popups.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ratatui::buffer::Buffer;
+    /// use ratatui::layout::Rect;
+    ///
+    /// let app = App::new(); // construct your App
+    /// let mut buf = Buffer::empty(Rect::new(0, 0, 80, 24));
+    /// app.render(Rect::new(0, 0, 80, 24), &mut buf);
+    /// ```
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from("NMTUI").bold().italic().centered();
 
@@ -95,7 +112,7 @@ impl Widget for &App {
 
         table.render(area, buf);
         // handle the render of the saved connections list
-        if self.show_saved {
+        if self.flags.show_saved {
             Clear.render(area, buf);
             let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
             let saved_block = Block::default()
@@ -145,7 +162,7 @@ impl Widget for &App {
         }
 
         // handle the render of the help menu
-        if self.show_help {
+        if self.flags.show_help {
             Clear.render(area, buf);
             let help_block = Block::default()
                 .title("Help Menu")
@@ -170,7 +187,7 @@ impl Widget for &App {
         }
 
         // handle the render of the delete confirmation popup
-        if self.show_delete_confirmation {
+        if self.flags.show_delete_confirmation {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Confirm Deletion")

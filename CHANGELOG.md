@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
 - Helper function to disconnect from the current connection
 - Utility function that will actually disconnect from the current connection
 
+### Changed
+
+- Changed the Flag to be in App level and added few more flags there
+
 ## [1.0.0] - 2025-12-30
 
 ### Added
