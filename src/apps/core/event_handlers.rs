@@ -114,6 +114,7 @@ impl App {
                     self.wifi_credentials.status =
                         disconnect_connected_network(self.wifi_list.clone());
                     self.wifi_credentials.flags.show_status_popup = true;
+                    scan_networks(self.wifi_list.clone());
                 }
                 _ => {}
             };

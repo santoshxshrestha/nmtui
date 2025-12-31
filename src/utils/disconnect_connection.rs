@@ -10,7 +10,7 @@ pub fn disconnect_connected_network(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) -> 
     for network in list.iter() {
         if network.in_use {
             let ssid = &network.ssid;
-            let output = Command::new("nmtui")
+            let output = Command::new("nmcli")
                 .args(["connection", "down", ssid])
                 .output();
             match output {
