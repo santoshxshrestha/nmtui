@@ -10,7 +10,7 @@ impl App {
     /// If a key event is available, handles it as follows:
     /// - Esc, Enter, or the `q` key will close the help view.
     /// - Ctrl+C will exit the application.
-    /// All other events are ignored. I/O errors from polling or reading input are propagated.
+    ///  All other events are ignored. I/O errors from polling or reading input are propagated.
     ///
     /// # Examples
     ///
