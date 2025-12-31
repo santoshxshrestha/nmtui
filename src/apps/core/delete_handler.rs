@@ -37,14 +37,14 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = false;
+                    self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('n'),
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = false;
+                    self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('c'),
@@ -59,14 +59,14 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = false;
+                    self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('q'),
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = false;
+                    self.flags.show_delete_confirmation = false;
                 }
 
                 _ => {}
@@ -75,7 +75,7 @@ impl App {
         Ok(())
     }
     pub fn delete_connection(&mut self) {
-        if self.show_saved {
+        if self.flags.show_saved {
             delete_connection(
                 self.saved_connection.connections[self.selected]
                     .ssid
@@ -84,7 +84,7 @@ impl App {
         } else {
             delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
         }
-        self.show_delete_confirmation = false;
+        self.flags.show_delete_confirmation = false;
         scan_networks(self.wifi_list.clone());
     }
 }

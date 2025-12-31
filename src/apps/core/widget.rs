@@ -95,7 +95,7 @@ impl Widget for &App {
 
         table.render(area, buf);
         // handle the render of the saved connections list
-        if self.show_saved {
+        if self.flags.show_saved {
             Clear.render(area, buf);
             let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
             let saved_block = Block::default()
@@ -145,7 +145,7 @@ impl Widget for &App {
         }
 
         // handle the render of the help menu
-        if self.show_help {
+        if self.flags.show_help {
             Clear.render(area, buf);
             let help_block = Block::default()
                 .title("Help Menu")
@@ -170,7 +170,7 @@ impl Widget for &App {
         }
 
         // handle the render of the delete confirmation popup
-        if self.show_delete_confirmation {
+        if self.flags.show_delete_confirmation {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Confirm Deletion")

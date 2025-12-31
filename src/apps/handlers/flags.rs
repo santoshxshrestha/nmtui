@@ -4,4 +4,7 @@ pub struct Flags {
     pub show_password_popup: bool,
     pub show_ssid_popup: bool,
     pub show_status_popup: bool,
+    pub show_delete_confirmation: bool,
+    pub show_saved: bool,
+    pub show_help: bool,
 }

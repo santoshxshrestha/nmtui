@@ -6,6 +6,7 @@ use crate::AppState;
 use crate::WifiNetwork;
 use crate::apps::core::saved_connection::SavedConnections;
 use crate::apps::handlers::WifiInputState;
+use crate::apps::handlers::flags::Flags;
 use crate::utils::connect::connect_to_saved_network;
 use crate::utils::disconnect_connection::disconnect_connected_network;
 use crate::utils::scan::scan_networks;
@@ -20,10 +21,8 @@ pub struct App {
     wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
-    show_delete_confirmation: bool,
-    show_saved: bool,
-    show_help: bool,
     saved_connection: SavedConnections,
+    flags: Flags,
 }
 
 impl Default for App {
@@ -35,10 +34,8 @@ impl Default for App {
             wifi_list,
             selected: 0,
             app_state: AppState::default(),
-            show_delete_confirmation: false,
-            show_help: false,
-            show_saved: false,
             saved_connection: SavedConnections::default(),
+            flags: Flags::default(),
         }
     }
 }

@@ -43,6 +43,6 @@ impl App {
         Ok(())
     }
     pub fn close_help(&mut self) {
-        self.show_help = false;
+        self.flags.show_help = false;
     }
 }
