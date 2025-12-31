@@ -1,5 +1,4 @@
 use super::App;
-use crate::utils::disconnect_connection::disconnect_connected_network;
 use crate::utils::scan::scan_networks;
 
 use crossterm::event::KeyEventKind::Press;
