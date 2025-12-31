@@ -15,7 +15,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
 
                 Event::Key(KeyEvent {
@@ -23,7 +23,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Esc,
@@ -96,7 +96,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.show_delete_confirmation = true;
+                    self.flags.show_delete_confirmation = true;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('s'),

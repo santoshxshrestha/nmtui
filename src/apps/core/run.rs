@@ -13,16 +13,16 @@ impl App {
             // priority with out handling the events of the other one
 
             // to handle the help popup
-            if self.show_help {
+            if self.flags.show_help {
                 self.handle_help()?;
             }
             // to handle the delete confirmation popup this is at top becuase it is displayed
             // over other popups
-            else if self.show_delete_confirmation {
+            else if self.flags.show_delete_confirmation {
                 self.handle_delete_confirmation()?;
             }
             // to handle the saved connections popup
-            else if self.show_saved {
+            else if self.flags.show_saved {
                 self.handle_saved()?;
             }
             // to handle the wifi ssid input popups

@@ -113,7 +113,7 @@ impl App {
                     ..
                 }) => {
                     // this will evaluate to run the delete confirmation dialog from the core ui
-                    self.show_delete_confirmation = true;
+                    self.flags.show_delete_confirmation = true;
                 }
 
                 Event::Key(KeyEvent {
@@ -149,14 +149,14 @@ impl App {
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('?'),
                     kind: event::KeyEventKind::Press,
                     ..
                 }) => {
-                    self.show_help = true;
+                    self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('r'),
@@ -182,10 +182,10 @@ impl App {
     }
     pub fn open_saved_list(&mut self) {
         self.saved_connection.fetch_saved_connections();
-        self.show_saved = true;
+        self.flags.show_saved = true;
     }
 
     pub fn close_saved_list(&mut self) {
-        self.show_saved = false;
+        self.flags.show_saved = false;
     }
 }
