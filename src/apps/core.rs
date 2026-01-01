@@ -127,4 +127,8 @@ impl App {
         self.wifi_credentials.flags.show_status_popup = true;
         scan_networks(self.wifi_list.clone());
     }
+
+    fn reset_selection(&mut self) {
+        self.selected = 0;
+    }
 }

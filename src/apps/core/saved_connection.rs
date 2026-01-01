@@ -227,4 +227,8 @@ impl App {
     pub fn close_saved_list(&mut self) {
         self.flags.show_saved = false;
     }
+
+    pub fn reset_saved_selection(&mut self) {
+        self.saved_connection.selected_index = 0;
+    }
 }
