@@ -109,7 +109,7 @@ impl App {
     pub fn delete_connection(&mut self) {
         if self.flags.show_saved {
             delete_connection(
-                self.saved_connection.connections[self.selected]
+                self.saved_connection.connections[self.saved_connection.selected_index]
                     .ssid
                     .clone(),
             );
