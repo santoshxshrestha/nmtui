@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-01-01
+
 ### Added
 
 - Listner for disconnecting the current connection
@@ -42,5 +44,6 @@ All notable changes to this project will be documented in this file.
 - Initial project structure
 - Working state with some feat like network scanning
 
-[Unreleased]: https://github.com/santoshxshrestha/nmtui/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/santoshxshrestha/nmtui/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v1.1.0
 [1.0.0]: https://github.com/santoshxshrestha/nmtui/releases/tag/v1.0.0
