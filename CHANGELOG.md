@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed the issue in the saved-connection list where when we try to delete a connection, it was doing the deletion from the index of the main list instead of the saved connection list.
 - Fixed the refresh issue of the list after the deletion of a saved connection.
+- Fixed the outo of bound issue when the list gets refreshed after deletion.
 
 ## [1.0.0] - 2025-12-30
 
