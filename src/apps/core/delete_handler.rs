@@ -107,16 +107,23 @@ impl App {
     /// app.delete_connection();
     /// ```
     pub fn delete_connection(&mut self) {
+        // Determine which connection to delete based on the current view
+        //
+        // here this one will delete from the saved connections list
         if self.flags.show_saved {
             delete_connection(
-                self.saved_connection.connections[self.selected]
+                self.saved_connection.connections[self.saved_connection.selected_index]
                     .ssid
                     .clone(),
             );
+            self.reset_saved_selection();
+            self.saved_connection.fetch_saved_connections();
         } else {
+            // this one will delete the connection from the wifi list
             delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
+            self.reset_selection();
+            scan_networks(self.wifi_list.clone());
         }
         self.flags.show_delete_confirmation = false;
-        scan_networks(self.wifi_list.clone());
     }
 }
