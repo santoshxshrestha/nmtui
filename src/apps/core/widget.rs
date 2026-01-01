@@ -19,7 +19,7 @@ const INFO_TEXT: [&str; 2] = [
     "(Enter) connect to network | (↑) move up | (↓) move down",
 ];
 
-const HELP_TEST: [&str; 11] = [
+const HELP_TEXT: [&str; 12] = [
     "[Esc] quit",
     "(Ctrl+c) force quit",
     "(Ctrl+R) scan for networks",
@@ -31,6 +31,7 @@ const HELP_TEST: [&str; 11] = [
     "(h) help",
     "(?) help",
     "(s) view saved networks",
+    "(x) disconnect from current network",
 ];
 
 impl Widget for &App {
@@ -177,7 +178,7 @@ impl Widget for &App {
                 height: area.height * 2 / 3,
             };
 
-            let help_paragraph = Paragraph::new(HELP_TEST.join("\n"))
+            let help_paragraph = Paragraph::new(HELP_TEXT.join("\n"))
                 .block(help_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
