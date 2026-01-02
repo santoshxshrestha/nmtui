@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the rerendering issue of the cursor by removing it from the render method and placing it to the draw method.
+
 ## [1.1.0] - 2025-01-01
 
 ### Added

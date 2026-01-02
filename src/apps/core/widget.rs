@@ -1,9 +1,5 @@
 use super::App;
 
-use crossterm::cursor::DisableBlinking;
-use crossterm::cursor::EnableBlinking;
-use crossterm::cursor::{self, MoveTo};
-use crossterm::execute;
 use ratatui::widgets::Clear;
 use ratatui::{
     buffer::Buffer,
@@ -12,14 +8,13 @@ use ratatui::{
     text::Line,
     widgets::{Block, Paragraph, Row, Table, TableState, Widget},
 };
-use std::io;
 
 const INFO_TEXT: [&str; 2] = [
     "[Esc] quit | (Ctrl+R) scan for networks | (h) help ",
     "(Enter) connect to network | (↑) move up | (↓) move down",
 ];
 
-const HELP_TEST: [&str; 11] = [
+const HELP_TEXT: [&str; 12] = [
     "[Esc] quit",
     "(Ctrl+c) force quit",
     "(Ctrl+R) scan for networks",
@@ -31,15 +26,15 @@ const HELP_TEST: [&str; 11] = [
     "(h) help",
     "(?) help",
     "(s) view saved networks",
+    "(x) disconnect from current network",
 ];
 
 impl Widget for &App {
-    /// Render the application's terminal UI into the provided drawing area buffer.
+    /// Render the application's terminal UI into the provided drawing area.
     ///
-    /// This draws the main network table and, depending on internal flags and state,
-    /// overlays the saved-connections list, help menu, delete-confirmation popup,
-    /// hidden-SSID input popup, password input popup, and status popup. Cursor
-    /// visibility and blinking are adjusted as needed for input popups.
+    /// Draws the main network table and, depending on the app's flags and state,
+    /// conditionally overlays the saved-connections list, help menu, delete-confirmation
+    /// popup, hidden-SSID input popup, password input popup, and status popup.
     ///
     /// # Examples
     ///
@@ -114,7 +109,6 @@ impl Widget for &App {
         // handle the render of the saved connections list
         if self.flags.show_saved {
             Clear.render(area, buf);
-            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
             let saved_block = Block::default()
                 .title("Saved Connections")
                 .borders(ratatui::widgets::Borders::ALL)
@@ -177,11 +171,9 @@ impl Widget for &App {
                 height: area.height * 2 / 3,
             };
 
-            let help_paragraph = Paragraph::new(HELP_TEST.join("\n"))
+            let help_paragraph = Paragraph::new(HELP_TEXT.join("\n"))
                 .block(help_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
-
-            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
 
             help_paragraph.render(help_area, buf);
         }
@@ -208,8 +200,6 @@ impl Widget for &App {
                     .block(popup_block)
                     .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
 
-            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
-
             confirmation_paragraph.render(popup_area, buf);
         }
 
@@ -232,16 +222,6 @@ impl Widget for &App {
             let ssid_paragraph = Paragraph::new(self.wifi_credentials.ssid.as_str())
                 .block(popup_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
-
-            let _ = execute!(
-                io::stdout(),
-                cursor::Show,
-                MoveTo(
-                    popup_area.x + self.wifi_credentials.cursor_pos + 1,
-                    popup_area.y + 1,
-                ),
-                EnableBlinking
-            );
 
             ssid_paragraph.render(popup_area, buf);
         }
@@ -266,16 +246,6 @@ impl Widget for &App {
             let password_paragraph = Paragraph::new(self.wifi_credentials.password.as_str())
                 .block(popup_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
-
-            let _ = execute!(
-                io::stdout(),
-                cursor::Show,
-                MoveTo(
-                    popup_area.x + self.wifi_credentials.cursor_pos + 1,
-                    popup_area.y + 1,
-                ),
-                EnableBlinking
-            );
 
             password_paragraph.render(popup_area, buf);
         }
@@ -304,8 +274,6 @@ impl Widget for &App {
             let status_paragraph = Paragraph::new(stauts)
                 .block(status_block)
                 .style(ratatui::style::Style::default().fg(ratatui::style::Color::White));
-
-            let _ = execute!(io::stdout(), cursor::Hide, DisableBlinking);
 
             status_paragraph.render(status_area, buf);
         }
