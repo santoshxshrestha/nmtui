@@ -30,12 +30,11 @@ const HELP_TEXT: [&str; 12] = [
 ];
 
 impl Widget for &App {
-    /// Render the application's terminal UI into the provided drawing area buffer.
+    /// Render the application's terminal UI into the provided drawing area.
     ///
-    /// This draws the main network table and, depending on internal flags and state,
-    /// overlays the saved-connections list, help menu, delete-confirmation popup,
-    /// hidden-SSID input popup, password input popup, and status popup. Cursor
-    /// visibility and blinking are adjusted as needed for input popups.
+    /// Draws the main network table and, depending on the app's flags and state,
+    /// conditionally overlays the saved-connections list, help menu, delete-confirmation
+    /// popup, hidden-SSID input popup, password input popup, and status popup.
     ///
     /// # Examples
     ///

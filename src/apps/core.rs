@@ -59,6 +59,17 @@ impl Default for App {
 }
 
 impl App {
+    /// Render the application UI and manage terminal cursor visibility and position for SSID/password popups.
+    ///
+    /// When an SSID or password popup is visible, this sets the terminal cursor to the popup's input position
+    /// and enables cursor blinking; otherwise it hides the cursor and disables blinking.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// // Assuming `app` is an initialized `App` and `frame` is a mutable `ratatui::Frame`:
+    /// // app.draw(&mut frame);
+    /// ```
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
 
@@ -83,6 +94,15 @@ impl App {
         }
     }
 
+    /// Mark the application to exit by setting its internal exit flag.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let mut app = App::default();
+    /// app.exit();
+    /// assert!(app.app_state.exit);
+    /// ```
     fn exit(&mut self) {
         self.app_state.exit = true;
     }
