@@ -231,7 +231,7 @@ impl Widget for &App {
         }
 
         // handle the render of the ssid input popup for hidden networks
-        if self.wifi_credentials.flags.is_hidden {
+        if self.wifi_credentials.flags.show_ssid_popup {
             Clear.render(area, buf);
             let popup_block = Block::default()
                 .title("Enter the ssid of the hidden network")
