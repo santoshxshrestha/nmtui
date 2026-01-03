@@ -115,7 +115,14 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.flags.show_delete_confirmation = true;
+                    if self
+                        .wifi_list
+                        .read()
+                        .expect("Wifi list lock poisoned while deleting")[self.selected]
+                        .is_saved
+                    {
+                        self.flags.show_delete_confirmation = true;
+                    }
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('s'),
