@@ -130,7 +130,7 @@ impl App {
                     self.wifi_credentials.flags.show_status_popup = true;
 
                     // refresh the network list after connection attempt
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 // if the selected network is hidden network option
                 // the show status popup will be handled by the password input listener
@@ -152,7 +152,7 @@ impl App {
                     self.wifi_credentials.status = status;
                     self.wifi_credentials.flags.show_status_popup = true;
                     // refresh the network list after connection attempt
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 // else show the password popup
                 else {
@@ -181,7 +181,7 @@ impl App {
     fn disconnect(&mut self) {
         self.wifi_credentials.status = disconnect_connected_network(self.wifi_list.clone());
         self.wifi_credentials.flags.show_status_popup = true;
-        scan_networks(self.wifi_list.clone());
+        scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
     }
 
     fn reset_selection(&mut self) {

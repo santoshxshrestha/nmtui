@@ -65,7 +65,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,

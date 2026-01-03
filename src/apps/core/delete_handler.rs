@@ -126,7 +126,7 @@ impl App {
                     .clone(),
             );
             self.reset_selection();
-            scan_networks(self.wifi_list.clone());
+            scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
         }
         self.flags.show_delete_confirmation = false;
     }
