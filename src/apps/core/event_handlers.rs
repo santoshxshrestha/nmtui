@@ -65,7 +65,7 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
@@ -115,7 +115,14 @@ impl App {
                     kind: Press,
                     ..
                 }) => {
-                    self.flags.show_delete_confirmation = true;
+                    if self
+                        .wifi_list
+                        .read()
+                        .expect("Wifi list lock poisoned while deleting")[self.selected]
+                        .is_saved
+                    {
+                        self.flags.show_delete_confirmation = true;
+                    }
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('s'),

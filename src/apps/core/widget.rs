@@ -8,6 +8,8 @@ use ratatui::{
     text::Line,
     widgets::{Block, Paragraph, Row, Table, TableState, Widget},
 };
+use std::sync::atomic::Ordering;
+use std::time::{self, SystemTime};
 
 const INFO_TEXT: [&str; 2] = [
     "[Esc] quit | (Ctrl+R) scan for networks | (h) help ",
@@ -63,31 +65,56 @@ impl Widget for &App {
         );
 
         let mut rows = Vec::new();
-        match self.wifi_list.try_lock() {
-            Ok(wifi_list) => {
-                for (i, network) in wifi_list.iter().enumerate() {
-                    let ssid = if network.in_use {
-                        format!("* {}", network.ssid)
-                    } else {
-                        network.ssid.clone()
-                    };
-                    let mut row = Row::new(vec![
-                        ssid,
-                        network.security.clone(),
-                        network.is_saved.to_string(),
-                    ]);
-                    if i == self.selected {
-                        row = row.style(
-                            ratatui::style::Style::default()
-                                .fg(ratatui::style::Color::Black)
-                                .bg(ratatui::style::Color::White),
-                        );
-                    }
-                    rows.push(row);
+
+        if self.flags.is_scanning.load(Ordering::SeqCst) {
+            let spinner = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+            // Use some time-based value for the index
+            // this will select a different spinner character every 100ms
+            // and push it to teh rows vector
+            // as this function is called every frame during the scanning process
+            // this will create the illusion of a spinner animation
+            let index = SystemTime::now()
+                .duration_since(time::UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis()
+                / 100;
+
+            let spinner_char = spinner[index as usize % spinner.len()];
+
+            rows.push(Row::new(vec![
+                format!("{} Scanning...", spinner_char),
+                "".into(),
+                "".into(),
+            ]));
+        } else {
+            // This will not panic untill the thread holding the write lock panics so we can just unwrap here
+            let wifi_list = self.wifi_list.read().expect("WifiNetworks lock poisoned");
+
+            // populate the rows of the table that displays the wifi networks and highlights the selected one
+            // This will never be empty because we always add the "Connect to Hidden network" entry
+            // untill I implement a better way to handle the addition of hidden networks
+
+            // TODO: implement the case if there are not networks found with a message to the user
+            for (i, network) in wifi_list.iter().enumerate() {
+                let ssid = if network.in_use {
+                    format!("* {}", network.ssid)
+                } else {
+                    network.ssid.clone()
+                };
+                let mut row = Row::new(vec![
+                    ssid,
+                    network.security.clone(),
+                    network.is_saved.to_string(),
+                ]);
+                if i == self.selected {
+                    row = row.style(
+                        ratatui::style::Style::default()
+                            .fg(ratatui::style::Color::Black)
+                            .bg(ratatui::style::Color::White),
+                    );
                 }
-            }
-            Err(_) => {
-                rows.push(Row::new(vec!["Scanning...", ""]));
+                rows.push(row);
             }
         }
 

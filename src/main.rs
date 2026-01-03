@@ -18,6 +18,6 @@ struct AppState {
 
 fn main() -> Result<()> {
     color_eyre::install()?;
-    tui().unwrap();
+    tui().expect("Failed to run TUI application");
     Ok(())
 }

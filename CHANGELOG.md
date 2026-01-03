@@ -6,13 +6,26 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Fixed the rerendering issue of the cursor by removing it from the render method and placing it to the draw method.
+### Fixed
+
+- Fixed the re-rendering issue of the cursor by removing it from the render method and placing it to the draw method.
+- Fixed the issue of pop-up for pressing 'd' key in the unsaved connection from the main list.
+
+### Changed
+
+- Added a flag to indicate whether the app is scanning the networks or not.
+- Changed the type of list that was send to the scan_networks function from main App `struct` to be `RwLock` wrapped type rather than Arc wrapped type.
+
+### Changed
+
+- Changed the type of list that was send to the scan_networks function from main App `struct` to be `RwLock` wrapped type rather than Arc wrapped type.
+- Changed the render method to render the scanning status with small animation in accordance with the scanning flag rather then the `.try_lock()` method that was used earlier.
 
 ## [1.1.0] - 2025-01-01
 
 ### Added
 
-- Listner for disconnecting the current connection
+- Listener for disconnecting the current connection
 - Helper function to disconnect from the current connection
 - Utility function that will actually disconnect from the current connection
 
@@ -24,7 +37,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed the issue in the saved-connection list where when we try to delete a connection, it was doing the deletion from the index of the main list instead of the saved connection list.
 - Fixed the refresh issue of the list after the deletion of a saved connection.
-- Fixed the outo of bound issue when the list gets refreshed after deletion.
+- Fixed the out of bound issue when the list gets refreshed after deletion.
 
 ## [1.0.0] - 2025-12-30
 
@@ -33,8 +46,8 @@ All notable changes to this project will be documented in this file.
 - documentation and comments
 - help menu
 - list for saved connections,
-- delete connection confirmation popup,
-- listeners for all the popups/menus
+- delete connection confirmation pop-up,
+- listeners for all the pop-ups/menus
 
 ### Changed
 

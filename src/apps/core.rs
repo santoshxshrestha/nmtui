@@ -17,14 +17,16 @@ use crossterm::execute;
 use ratatui::Frame;
 use ratatui::layout::Position;
 use std::io;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 mod delete_handler;
 mod help_handlers;
+use std::sync::RwLock;
+use std::sync::atomic::AtomicBool;
 
 #[derive(Debug)]
 pub struct App {
     wifi_credentials: WifiInputState,
-    wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
+    wifi_list: Arc<RwLock<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
     saved_connection: SavedConnections,
@@ -45,15 +47,23 @@ impl Default for App {
     /// assert!(app.wifi_list.lock().unwrap().is_empty());
     /// ```
     fn default() -> Self {
-        let wifi_list = Arc::new(Mutex::new(Vec::new()));
-        scan_networks(wifi_list.clone());
+        let wifi_list = Arc::new(RwLock::new(Vec::new()));
+
+        // Setting up scanning flag
+        let is_scanning = Arc::new(AtomicBool::new(true));
+        scan_networks(wifi_list.clone(), is_scanning.clone());
         Self {
             wifi_credentials: WifiInputState::default(),
             wifi_list,
             selected: 0,
             app_state: AppState::default(),
             saved_connection: SavedConnections::default(),
-            flags: Flags::default(),
+            flags: {
+                Flags {
+                    is_scanning,
+                    ..Default::default()
+                }
+            },
         }
     }
 }
@@ -108,7 +118,7 @@ impl App {
     }
 
     fn prepare_to_connect(&mut self) {
-        match self.wifi_list.try_lock() {
+        match self.wifi_list.write() {
             Ok(wifi_list) => {
                 // if the selected network is already in use, do nothing
                 if wifi_list[self.selected].in_use {
@@ -120,7 +130,7 @@ impl App {
                     self.wifi_credentials.flags.show_status_popup = true;
 
                     // refresh the network list after connection attempt
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 // if the selected network is hidden network option
                 // the show status popup will be handled by the password input listener
@@ -142,7 +152,7 @@ impl App {
                     self.wifi_credentials.status = status;
                     self.wifi_credentials.flags.show_status_popup = true;
                     // refresh the network list after connection attempt
-                    scan_networks(self.wifi_list.clone());
+                    scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 // else show the password popup
                 else {
@@ -158,7 +168,7 @@ impl App {
     }
 
     fn update_selected_network(&mut self, direction: isize) {
-        if let Ok(wifi_list) = self.wifi_list.try_lock() {
+        if let Ok(wifi_list) = self.wifi_list.read() {
             let len = wifi_list.len();
             if len > 0 {
                 self.selected =
@@ -171,7 +181,7 @@ impl App {
     fn disconnect(&mut self) {
         self.wifi_credentials.status = disconnect_connected_network(self.wifi_list.clone());
         self.wifi_credentials.flags.show_status_popup = true;
-        scan_networks(self.wifi_list.clone());
+        scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
     }
 
     fn reset_selection(&mut self) {

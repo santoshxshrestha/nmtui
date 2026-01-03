@@ -120,9 +120,13 @@ impl App {
             self.saved_connection.fetch_saved_connections();
         } else {
             // this one will delete the connection from the wifi list
-            delete_connection(self.wifi_list.lock().unwrap()[self.selected].ssid.clone());
+            delete_connection(
+                self.wifi_list.read().expect("WifiNetworks lock poisoned")[self.selected]
+                    .ssid
+                    .clone(),
+            );
             self.reset_selection();
-            scan_networks(self.wifi_list.clone());
+            scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
         }
         self.flags.show_delete_confirmation = false;
     }

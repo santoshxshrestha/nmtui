@@ -1,13 +1,14 @@
 use crate::WifiNetwork;
 use crate::utils::saved_connection::saved_connections;
 use std::process::Command;
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, RwLock};
 use std::thread;
 
-pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
+pub fn scan_networks(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>, is_scanning: Arc<AtomicBool>) {
+    is_scanning.store(true, Ordering::SeqCst);
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
-        let mut wifi_list_lock = wifi_list.lock().unwrap();
         let output = Command::new("nmcli")
             .args(["-t", "-f", "IN-USE,SSID,SECURITY", "device", "wifi", "list"])
             .output()
@@ -55,6 +56,9 @@ pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
             ssid: "Connect to Hidden network".to_string(),
             security: "?".to_string(),
         });
+
+        let mut wifi_list_lock = wifi_list.write().expect("WifiNetworks lock poisoned");
         *wifi_list_lock = networks;
+        is_scanning.store(false, Ordering::SeqCst);
     });
 }
