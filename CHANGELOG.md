@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed the re-rendering issue of the cursor by removing it from the render method and placing it to the draw method.
 - Fixed the issue of pop-up for pressing 'd' key in the unsaved connection from the main list.
+- Fixed the issue with the `esc` key not closing the ssid input pop-up by changing the flag that it was checking for.
 
 ### Changed
 
