@@ -21,6 +21,7 @@ use std::sync::Arc;
 mod delete_handler;
 mod help_handlers;
 use std::sync::RwLock;
+use std::sync::atomic::AtomicBool;
 
 #[derive(Debug)]
 pub struct App {
@@ -47,14 +48,22 @@ impl Default for App {
     /// ```
     fn default() -> Self {
         let wifi_list = Arc::new(RwLock::new(Vec::new()));
-        scan_networks(wifi_list.clone());
+
+        // Setting up scanning flag
+        let is_scanning = Arc::new(AtomicBool::new(true));
+        scan_networks(wifi_list.clone(), is_scanning.clone());
         Self {
             wifi_credentials: WifiInputState::default(),
             wifi_list,
             selected: 0,
             app_state: AppState::default(),
             saved_connection: SavedConnections::default(),
-            flags: Flags::default(),
+            flags: {
+                Flags {
+                    is_scanning,
+                    ..Default::default()
+                }
+            },
         }
     }
 }
