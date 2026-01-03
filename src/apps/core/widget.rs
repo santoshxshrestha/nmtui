@@ -9,6 +9,7 @@ use ratatui::{
     widgets::{Block, Paragraph, Row, Table, TableState, Widget},
 };
 use std::sync::atomic::Ordering;
+use std::time::{self, SystemTime};
 
 const INFO_TEXT: [&str; 2] = [
     "[Esc] quit | (Ctrl+R) scan for networks | (h) help ",
@@ -66,14 +67,26 @@ impl Widget for &App {
         let mut rows = Vec::new();
 
         if self.flags.is_scanning.load(Ordering::SeqCst) {
-            // TODO: add a spinner or some animation
-            // Showing scanning message
-            let scanning_row = Row::new(vec!["Scanning for networks...", "", ""]).style(
-                ratatui::style::Style::default()
-                    .fg(ratatui::style::Color::LightBlue)
-                    .italic(),
-            );
-            rows.push(scanning_row);
+            let spinner = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+            // Use some time-based value for the index
+            // this will select a different spinner character every 100ms
+            // and push it to teh rows vector
+            // as this function is called every frame during the scanning process
+            // this will create the illusion of a spinner animation
+            let index = SystemTime::now()
+                .duration_since(time::UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis()
+                / 100;
+
+            let spinner_char = spinner[index as usize % spinner.len()];
+
+            rows.push(Row::new(vec![
+                format!("{} Scanning...", spinner_char),
+                "".into(),
+                "".into(),
+            ]));
         } else {
             // This will not panic untill the thread holding the write lock panics so we can just unwrap here
             let wifi_list = self.wifi_list.read().expect("WifiNetworks lock poisoned");
