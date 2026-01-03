@@ -7,7 +7,7 @@ use std::thread;
 pub fn scan_networks(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>) {
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
-        let mut wifi_list_lock = wifi_list.write().unwrap();
+        let mut wifi_list_lock = wifi_list.write().expect("WifiNetworks lock poisoned");
         let output = Command::new("nmcli")
             .args(["-t", "-f", "IN-USE,SSID,SECURITY", "device", "wifi", "list"])
             .output()

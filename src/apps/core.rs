@@ -17,7 +17,7 @@ use crossterm::execute;
 use ratatui::Frame;
 use ratatui::layout::Position;
 use std::io;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 mod delete_handler;
 mod help_handlers;
 use std::sync::RwLock;
@@ -109,7 +109,7 @@ impl App {
     }
 
     fn prepare_to_connect(&mut self) {
-        match self.wifi_list.try_lock() {
+        match self.wifi_list.write() {
             Ok(wifi_list) => {
                 // if the selected network is already in use, do nothing
                 if wifi_list[self.selected].in_use {
@@ -159,7 +159,7 @@ impl App {
     }
 
     fn update_selected_network(&mut self, direction: isize) {
-        if let Ok(wifi_list) = self.wifi_list.try_lock() {
+        if let Ok(wifi_list) = self.wifi_list.read() {
             let len = wifi_list.len();
             if len > 0 {
                 self.selected =

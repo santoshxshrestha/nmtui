@@ -1,11 +1,11 @@
 use crate::{WifiNetwork, apps::handlers::status::Status};
 use std::{
     process::{Command, ExitStatus},
-    sync::{Arc, Mutex},
+    sync::{Arc, RwLock},
 };
 
-pub fn disconnect_connected_network(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) -> Status {
-    let list = wifi_list.lock().expect("WifiNetworks lock poisoned");
+pub fn disconnect_connected_network(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>) -> Status {
+    let list = wifi_list.read().expect("WifiNetworks lock poisoned");
 
     for network in list.iter() {
         if network.in_use {

@@ -63,7 +63,7 @@ impl Widget for &App {
         );
 
         let mut rows = Vec::new();
-        match self.wifi_list.try_lock() {
+        match self.wifi_list.read() {
             Ok(wifi_list) => {
                 for (i, network) in wifi_list.iter().enumerate() {
                     let ssid = if network.in_use {
