@@ -20,11 +20,12 @@ use std::io;
 use std::sync::{Arc, Mutex};
 mod delete_handler;
 mod help_handlers;
+use std::sync::RwLock;
 
 #[derive(Debug)]
 pub struct App {
     wifi_credentials: WifiInputState,
-    wifi_list: Arc<Mutex<Vec<WifiNetwork>>>,
+    wifi_list: Arc<RwLock<Vec<WifiNetwork>>>,
     selected: usize,
     app_state: AppState,
     saved_connection: SavedConnections,
@@ -45,7 +46,7 @@ impl Default for App {
     /// assert!(app.wifi_list.lock().unwrap().is_empty());
     /// ```
     fn default() -> Self {
-        let wifi_list = Arc::new(Mutex::new(Vec::new()));
+        let wifi_list = Arc::new(RwLock::new(Vec::new()));
         scan_networks(wifi_list.clone());
         Self {
             wifi_credentials: WifiInputState::default(),
