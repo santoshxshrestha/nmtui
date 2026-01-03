@@ -6,6 +6,7 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 
 pub fn scan_networks(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>, is_scanning: Arc<AtomicBool>) {
+    is_scanning.store(true, Ordering::SeqCst);
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
         let output = Command::new("nmcli")
