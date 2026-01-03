@@ -6,9 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+### Fixed
+
 - Fixed the re-rendering issue of the cursor by removing it from the render method and placing it to the draw method.
-- Added a flag to indicate whether the app is scanning the networks or not.
 - Fixed the issue of pop-up for pressing 'd' key in the unsaved connection from the main list.
+
+### Changed
+
+- Added a flag to indicate whether the app is scanning the networks or not.
+- Changed the type of list that was send to the scan_networks function from main App `struct` to be `RwLock` wrapped type rather than Arc wrapped type.
 
 ### Changed
 
