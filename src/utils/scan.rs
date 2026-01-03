@@ -1,13 +1,13 @@
 use crate::WifiNetwork;
 use crate::utils::saved_connection::saved_connections;
 use std::process::Command;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
 use std::thread;
 
-pub fn scan_networks(wifi_list: Arc<Mutex<Vec<WifiNetwork>>>) {
+pub fn scan_networks(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>) {
     // // nmcli -t -f IN-USE,SSID,SECURITY device wifi list
     thread::spawn(move || {
-        let mut wifi_list_lock = wifi_list.lock().unwrap();
+        let mut wifi_list_lock = wifi_list.write().unwrap();
         let output = Command::new("nmcli")
             .args(["-t", "-f", "IN-USE,SSID,SECURITY", "device", "wifi", "list"])
             .output()
