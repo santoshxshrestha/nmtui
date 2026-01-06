@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Fixed cursor position logic when transitioning between SSID and password inputs for hidden networks.
+- Fixed an issue where the cursor would "ghost" or jump to the right when opening the password popup by resetting the cursor position on initialization.
 - Fixed the re-rendering issue of the cursor by removing it from the render method and placing it to the draw method.
 - Fixed the issue of pop-up for pressing 'd' key in the unsaved connection from the main list.
 - Fixed the issue with the `esc` key not closing the ssid input pop-up by changing the flag that it was checking for.

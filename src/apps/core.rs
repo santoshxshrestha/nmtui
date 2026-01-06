@@ -159,6 +159,7 @@ impl App {
                     self.wifi_credentials.flags.show_password_popup = true;
                     self.wifi_credentials.ssid = wifi_list[self.selected].ssid.clone();
                     self.wifi_credentials.password.clear();
+                    self.wifi_credentials.reset_cursor_position();
                 }
             }
             Err(_) => {

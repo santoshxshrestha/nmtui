@@ -32,8 +32,8 @@ impl WifiInputState {
                     self.flags.show_password_popup = false;
                     if self.flags.is_hidden {
                         self.flags.show_ssid_popup = true;
+                        self.cursor_pos = self.ssid.chars().count() as u16;
                     }
-                    self.cursor_pos = self.ssid.chars().count() as u16;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
