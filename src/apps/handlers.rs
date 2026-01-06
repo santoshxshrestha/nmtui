@@ -29,7 +29,7 @@ impl WifiInputState {
         self.cursor_pos = self.cursor_pos.saturating_sub(1);
     }
 
-    fn reset_cursor_position(&mut self) {
+    pub fn reset_cursor_position(&mut self) {
         self.cursor_pos = 0;
     }
 }
