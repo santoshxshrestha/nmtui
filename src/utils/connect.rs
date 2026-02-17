@@ -1,10 +1,9 @@
-use crate::apps::handlers::WifiInputState;
-use crate::apps::handlers::flags::Flags;
-use crate::apps::handlers::status::Status;
-use std::process::Output;
-use std::process::{Command, ExitStatus};
+use crate::apps::handlers::{WifiInputState, flags::Flags, status::Status};
+use std::io::Error;
+use std::process::{Command, ExitStatus, Output};
 
-fn handle_output(output: Output, ssid: &str) -> Status {
+// handle the output of the command execution and return a Status object
+fn handle_command_output(output: Output, ssid: &str) -> Status {
     let status = output.status;
     if status.success() {
         let stdout = format!("Successfully connected to '{}'", ssid);
@@ -15,19 +14,23 @@ fn handle_output(output: Output, ssid: &str) -> Status {
     }
 }
 
-// Connect to a saved network without password
-pub fn connect_to_saved_network(ssid: &str) -> Status {
-    let output = Command::new("nmcli")
-        .args(["dev", "wifi", "connect", ssid])
-        .output();
-
-    match output {
-        Ok(output) => handle_output(output, ssid),
+// handle the result of the command execution and return a Status object
+fn handle_command_result(result: Result<Output, Error>, ssid: &str) -> Status {
+    match result {
+        Ok(output) => handle_command_output(output, ssid),
         Err(e) => Status::new(
             format!("Failed to execute nmcli: {}", e),
             ExitStatus::default(),
         ),
     }
+}
+
+// Connect to a saved network without password
+pub fn connect_to_saved_network(ssid: &str) -> Status {
+    let output = Command::new("nmcli")
+        .args(["dev", "wifi", "connect", ssid])
+        .output();
+    handle_command_result(output, ssid)
 }
 
 // Connect to a network with given credentials
@@ -53,11 +56,5 @@ pub fn connect_to_network(wifi_creadentials: &WifiInputState) -> Status {
             .output()
     };
 
-    match output {
-        Ok(output) => handle_output(output, ssid),
-        Err(e) => Status::new(
-            format!("Failed to execute nmcli: {}", e),
-            ExitStatus::default(),
-        ),
-    }
+    handle_command_result(output, ssid)
 }
