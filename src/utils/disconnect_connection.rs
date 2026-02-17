@@ -1,4 +1,4 @@
-use crate::{WifiNetwork, apps::handlers::status::Status};
+use crate::{apps::handlers::status::Status, WifiNetwork};
 use std::{
     process::{Command, ExitStatus},
     sync::{Arc, RwLock},
@@ -36,9 +36,10 @@ pub fn disconnect_connected_network(wifi_list: Arc<RwLock<Vec<WifiNetwork>>>) ->
             let output = Command::new("nmcli")
                 .args(["connection", "down", ssid])
                 .output();
-            // we are not returning any thign if hte network disconnected successfully,
-            // but if there is an error we will return the error message
-            handle_command_result(output);
+            let status = handle_command_result(output);
+            if status.status_code.success() {
+                return status;
+            }
         }
     }
     Status::new(
