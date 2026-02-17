@@ -24,28 +24,25 @@ impl App {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Esc,
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_help();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Enter,
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_help();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('q'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_help();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('c'),
-                    kind: event::KeyEventKind::Press,
+
                     modifiers: event::KeyModifiers::CONTROL,
                     ..
                 }) => {

@@ -1,5 +1,5 @@
 use super::WifiInputState;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::process::ExitStatus;
 use std::time::Duration;
@@ -33,9 +33,7 @@ impl WifiInputState {
         if poll(Duration::from_micros(1))? {
             match event::read()? {
                 Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Esc, ..
                 }) => {
                     self.flags.show_status_popup = false;
                     self.status.status_message.clear();
@@ -43,7 +41,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('q'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_status_popup = false;
@@ -52,7 +49,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_status_popup = false;

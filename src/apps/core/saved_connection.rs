@@ -87,21 +87,19 @@ impl App {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('q'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_saved_list();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Esc,
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.close_saved_list();
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('c'),
-                    kind: event::KeyEventKind::Press,
+
                     modifiers: event::KeyModifiers::CONTROL,
                     ..
                 }) => {
@@ -109,7 +107,6 @@ impl App {
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('d'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     // this will evaluate to run the delete confirmation dialog from the core ui
@@ -118,49 +115,43 @@ impl App {
 
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('j'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.update_selected_saved_network(1);
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Down,
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.update_selected_saved_network(1);
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('k'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.update_selected_saved_network(-1);
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Up,
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.update_selected_saved_network(-1);
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('h'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('?'),
-                    kind: event::KeyEventKind::Press,
                     ..
                 }) => {
                     self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
                     code: event::KeyCode::Char('r'),
-                    kind: event::KeyEventKind::Press,
+
                     modifiers: event::KeyModifiers::CONTROL,
                     ..
                 }) => {

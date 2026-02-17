@@ -2,7 +2,6 @@ use super::App;
 use crate::utils::delete_connection::delete_connection;
 use crate::utils::scan::scan_networks;
 
-use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::time::Duration;
@@ -31,57 +30,49 @@ impl App {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
-                    kind: Press,
                     ..
                 }) => {
                     self.delete_connection();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('Y'),
-                    kind: Press,
                     ..
                 }) => {
                     self.delete_connection();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('y'),
-                    kind: Press,
                     ..
                 }) => {
                     self.delete_connection();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('N'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('n'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('c'),
-                    kind: Press,
+
                     modifiers: event::KeyModifiers::CONTROL,
                     ..
                 }) => {
                     self.exit();
                 }
                 Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Esc, ..
                 }) => {
                     self.flags.show_delete_confirmation = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('q'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_delete_confirmation = false;

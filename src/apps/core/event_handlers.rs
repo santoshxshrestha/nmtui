@@ -1,7 +1,6 @@
 use super::App;
 use crate::utils::scan::scan_networks;
 
-use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
 use std::time::Duration;
@@ -31,7 +30,6 @@ impl App {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('h'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_help = true;
@@ -39,22 +37,18 @@ impl App {
 
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('?'),
-                    kind: Press,
                     ..
                 }) => {
                     self.flags.show_help = true;
                 }
                 Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Esc, ..
                 }) => {
                     self.exit();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('c'),
                     modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
                     ..
                 }) => {
                     self.exit();
@@ -62,35 +56,29 @@ impl App {
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('r'),
                     modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
                     ..
                 }) => {
                     scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
-                    kind: Press,
                     ..
                 }) => {
                     self.prepare_to_connect();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('o'),
-                    kind: Press,
                     ..
                 }) => {
                     self.prepare_to_connect();
                 }
                 Event::Key(KeyEvent {
-                    code: KeyCode::Up,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Up, ..
                 }) => {
                     self.update_selected_network(-1);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Down,
-                    kind: Press,
                     ..
                 }) => {
                     self.update_selected_network(1);
@@ -98,21 +86,18 @@ impl App {
                 // vim style
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('k'),
-                    kind: Press,
                     ..
                 }) => {
                     self.update_selected_network(-1);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('j'),
-                    kind: Press,
                     ..
                 }) => {
                     self.update_selected_network(1);
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('d'),
-                    kind: Press,
                     ..
                 }) => {
                     if self
@@ -126,14 +111,12 @@ impl App {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('s'),
-                    kind: Press,
                     ..
                 }) => {
                     self.open_saved_list();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char('x'),
-                    kind: Press,
                     ..
                 }) => {
                     self.disconnect();

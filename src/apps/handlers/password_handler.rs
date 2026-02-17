@@ -1,6 +1,6 @@
 use super::WifiInputState;
 use super::utils::{delete_char, enter_char, move_cursor_right};
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::time::Duration;
 
@@ -10,22 +10,18 @@ impl WifiInputState {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: KeyCode::Left,
-                    kind: Press,
                     ..
                 }) => {
                     self.move_cursor_left();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Right,
-                    kind: Press,
                     ..
                 }) => {
                     move_cursor_right(&self.password, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Esc, ..
                 }) => {
                     // if we go back from password input, we should show the ssid popup again
                     // with the cursor at the end of the ssid
@@ -37,7 +33,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
-                    kind: Press,
                     ..
                 }) => {
                     enter_char(&mut self.password, c, &self.cursor_pos);
@@ -45,7 +40,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
-                    kind: Press,
                     ..
                 }) => {
                     delete_char(&mut self.password, &mut self.cursor_pos);
@@ -53,7 +47,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
-                    kind: Press,
                     ..
                 }) => {
                     if self.password.is_empty() || self.password.chars().count() >= 8 {

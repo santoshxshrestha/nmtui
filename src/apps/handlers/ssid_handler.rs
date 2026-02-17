@@ -1,6 +1,6 @@
 use super::utils::{delete_char, enter_char, move_cursor_right};
 use crate::apps::handlers::WifiInputState;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::time::Duration;
 
@@ -10,28 +10,23 @@ impl WifiInputState {
             match event::read()? {
                 Event::Key(KeyEvent {
                     code: KeyCode::Left,
-                    kind: Press,
                     ..
                 }) => {
                     self.move_cursor_left();
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Right,
-                    kind: Press,
                     ..
                 }) => {
                     move_cursor_right(&self.ssid, &mut self.cursor_pos);
                 }
                 Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
+                    code: KeyCode::Esc, ..
                 }) => {
                     self.flags.show_ssid_popup = false;
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
-                    kind: Press,
                     ..
                 }) => {
                     enter_char(&mut self.ssid, c, &self.cursor_pos);
@@ -39,7 +34,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Backspace,
-                    kind: Press,
                     ..
                 }) => {
                     delete_char(&mut self.ssid, &mut self.cursor_pos);
@@ -47,7 +41,6 @@ impl WifiInputState {
                 }
                 Event::Key(KeyEvent {
                     code: KeyCode::Enter,
-                    kind: Press,
                     ..
                 }) => {
                     // when ssid is entered, we should show the password popup
