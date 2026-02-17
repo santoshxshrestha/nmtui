@@ -5,7 +5,7 @@ use std::{
 };
 
 // handle the output of the command execution and return a Status object
-fn handle_comand_output(output: std::process::Output) -> Status {
+fn handle_command_output(output: std::process::Output) -> Status {
     let status = output.status;
     if status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
@@ -19,7 +19,7 @@ fn handle_comand_output(output: std::process::Output) -> Status {
 // handle the result of the command execution and return a Status object
 fn handle_command_result(result: Result<std::process::Output, std::io::Error>) -> Status {
     match result {
-        Ok(output) => handle_comand_output(output),
+        Ok(output) => handle_command_output(output),
         Err(e) => Status::new(
             format!("Failed to execute nmcli: {}", e),
             ExitStatus::default(),
