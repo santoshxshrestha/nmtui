@@ -20,36 +20,22 @@ impl App {
     /// app.handle_help().unwrap();
     /// ```
     pub fn handle_help(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Esc,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (event::KeyCode::Esc, _)
+                | (event::KeyCode::Enter, _)
+                | (event::KeyCode::Char('q'), _) => {
                     self.close_help();
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Enter,
-                    ..
-                }) => {
-                    self.close_help();
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('q'),
-                    ..
-                }) => {
-                    self.close_help();
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('c'),
-
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (event::KeyCode::Char('c'), event::KeyModifiers::CONTROL) => {
                     self.exit();
                 }
                 _ => {}
-            };
+            }
         }
         Ok(())
     }
