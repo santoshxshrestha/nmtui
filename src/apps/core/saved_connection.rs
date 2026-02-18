@@ -83,82 +83,36 @@ impl App {
     /// let _ = app.handle_saved();
     /// ```
     pub fn handle_saved(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('q'),
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (event::KeyCode::Char('q'), _) | (event::KeyCode::Esc, _) => {
                     self.close_saved_list();
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Esc,
-                    ..
-                }) => {
-                    self.close_saved_list();
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('c'),
-
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (event::KeyCode::Char('c'), event::KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('d'),
-                    ..
-                }) => {
+                (event::KeyCode::Char('d'), _) => {
                     // this will evaluate to run the delete confirmation dialog from the core ui
                     self.flags.show_delete_confirmation = true;
                 }
-
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('j'),
-                    ..
-                }) => {
+                (event::KeyCode::Char('j'), _) | (event::KeyCode::Down, _) => {
                     self.update_selected_saved_network(1);
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Down,
-                    ..
-                }) => {
-                    self.update_selected_saved_network(1);
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('k'),
-                    ..
-                }) => {
+                (event::KeyCode::Char('k'), _) | (event::KeyCode::Up, _) => {
                     self.update_selected_saved_network(-1);
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Up,
-                    ..
-                }) => {
-                    self.update_selected_saved_network(-1);
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('h'),
-                    ..
-                }) => {
+                (event::KeyCode::Char('h'), _) | (event::KeyCode::Char('?'), _) => {
                     self.flags.show_help = true;
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('?'),
-                    ..
-                }) => {
-                    self.flags.show_help = true;
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('r'),
-
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (event::KeyCode::Char('r'), event::KeyModifiers::CONTROL) => {
                     self.saved_connection.fetch_saved_connections();
                 }
                 _ => {}
-            };
+            }
         }
         Ok(())
     }
