@@ -26,104 +26,60 @@ impl App {
     /// app.handle_events().unwrap();
     /// ```
     pub fn handle_events(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('h'),
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (KeyCode::Char('h'), _) => {
                     self.flags.show_help = true;
                 }
-
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('?'),
-                    ..
-                }) => {
+                (KeyCode::Char('?'), _) => {
                     self.flags.show_help = true;
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc, ..
-                }) => {
+                (KeyCode::Esc, _) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (KeyCode::Char('c'), KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('r'),
-                    modifiers: KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (KeyCode::Char('r'), KeyModifiers::CONTROL) => {
                     scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    ..
-                }) => {
+                (KeyCode::Char('o'), _) | (KeyCode::Enter, _) => {
                     self.prepare_to_connect();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('o'),
-                    ..
-                }) => {
-                    self.prepare_to_connect();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Up, ..
-                }) => {
+                (KeyCode::Up, _) | (KeyCode::Char('k'), _) => {
                     self.update_selected_network(-1);
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Down,
-                    ..
-                }) => {
+                (KeyCode::Down, _) | (KeyCode::Char('j'), _) => {
                     self.update_selected_network(1);
                 }
-                // vim style
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('k'),
-                    ..
-                }) => {
-                    self.update_selected_network(-1);
+                (KeyCode::Char('d'), _) => {
+                    self.set_delete_confirmation();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('j'),
-                    ..
-                }) => {
-                    self.update_selected_network(1);
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('d'),
-                    ..
-                }) => {
-                    if self
-                        .wifi_list
-                        .read()
-                        .expect("Wifi list lock poisoned while deleting")[self.selected]
-                        .is_saved
-                    {
-                        self.flags.show_delete_confirmation = true;
-                    }
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('s'),
-                    ..
-                }) => {
+                (KeyCode::Char('s'), _) => {
                     self.open_saved_list();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('x'),
-                    ..
-                }) => {
+                (KeyCode::Char('x'), _) => {
                     self.disconnect();
                 }
                 _ => {}
-            };
+            }
         }
+
         Ok(())
+    }
+
+    fn set_delete_confirmation(&mut self) {
+        if self
+            .wifi_list
+            .read()
+            .expect("Wifi list lock poisoned while deleting")[self.selected]
+            .is_saved
+        {
+            self.flags.show_delete_confirmation = true;
+        }
     }
 }
