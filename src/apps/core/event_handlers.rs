@@ -1,7 +1,6 @@
 use super::App;
 use crate::utils::scan::scan_networks;
 
-use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, poll};
 use std::io;
 use std::time::Duration;
@@ -27,120 +26,60 @@ impl App {
     /// app.handle_events().unwrap();
     /// ```
     pub fn handle_events(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('h'),
-                    kind: Press,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (KeyCode::Char('h'), _) => {
                     self.flags.show_help = true;
                 }
-
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('?'),
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('?'), _) => {
                     self.flags.show_help = true;
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Esc, _) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('c'), KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('r'),
-                    modifiers: KeyModifiers::CONTROL,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('r'), KeyModifiers::CONTROL) => {
                     scan_networks(self.wifi_list.clone(), self.flags.is_scanning.clone());
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('o'), _) | (KeyCode::Enter, _) => {
                     self.prepare_to_connect();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('o'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.prepare_to_connect();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Up,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Up, _) | (KeyCode::Char('k'), _) => {
                     self.update_selected_network(-1);
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Down,
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Down, _) | (KeyCode::Char('j'), _) => {
                     self.update_selected_network(1);
                 }
-                // vim style
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('k'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.update_selected_network(-1);
+                (KeyCode::Char('d'), _) => {
+                    self.set_delete_confirmation();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('j'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.update_selected_network(1);
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('d'),
-                    kind: Press,
-                    ..
-                }) => {
-                    if self
-                        .wifi_list
-                        .read()
-                        .expect("Wifi list lock poisoned while deleting")[self.selected]
-                        .is_saved
-                    {
-                        self.flags.show_delete_confirmation = true;
-                    }
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('s'),
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('s'), _) => {
                     self.open_saved_list();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('x'),
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('x'), _) => {
                     self.disconnect();
                 }
                 _ => {}
-            };
+            }
         }
+
         Ok(())
+    }
+
+    fn set_delete_confirmation(&mut self) {
+        if self
+            .wifi_list
+            .read()
+            .expect("Wifi list lock poisoned while deleting")[self.selected]
+            .is_saved
+        {
+            self.flags.show_delete_confirmation = true;
+        }
     }
 }

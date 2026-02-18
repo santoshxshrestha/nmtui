@@ -2,7 +2,6 @@ use super::App;
 use crate::utils::delete_connection::delete_connection;
 use crate::utils::scan::scan_networks;
 
-use crossterm::event::KeyEventKind::Press;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::time::Duration;
@@ -27,69 +26,27 @@ impl App {
     /// // let _ = app.handle_delete_confirmation();
     /// ```
     pub fn handle_delete_confirmation(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    kind: Press,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (KeyCode::Enter, _) | (KeyCode::Char('Y'), _) | (KeyCode::Char('y'), _) => {
                     self.delete_connection();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('Y'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.delete_connection();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('y'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.delete_connection();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('N'),
-                    kind: Press,
-                    ..
-                }) => {
+                (KeyCode::Char('N'), _)
+                | (KeyCode::Char('n'), _)
+                | (KeyCode::Esc, _)
+                | (KeyCode::Char('q'), _) => {
                     self.flags.show_delete_confirmation = false;
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('n'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    kind: Press,
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (KeyCode::Char('c'), event::KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('q'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-
                 _ => {}
             }
-        };
+        }
         Ok(())
     }
     /// Delete the currently selected connection and refresh the network list.

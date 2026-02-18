@@ -1,5 +1,5 @@
 use super::WifiInputState;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind::Press, poll};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, poll};
 use std::io;
 use std::process::ExitStatus;
 use std::time::Duration;
@@ -30,38 +30,18 @@ impl Status {
 
 impl WifiInputState {
     pub fn handle_status_message(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc,
-                    kind: Press,
-                    ..
-                }) => {
-                    self.flags.show_status_popup = false;
-                    self.status.status_message.clear();
-                    self.status.status_code = ExitStatus::default();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('q'),
-                    kind: Press,
-                    ..
-                }) => {
-                    self.flags.show_status_popup = false;
-                    self.status.status_message.clear();
-                    self.status.status_code = ExitStatus::default();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    kind: Press,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent { code, .. }) = event::read()?
+        {
+            match code {
+                KeyCode::Esc | KeyCode::Char('q') | KeyCode::Enter => {
                     self.flags.show_status_popup = false;
                     self.status.status_message.clear();
                     self.status.status_code = ExitStatus::default();
                 }
                 _ => {}
             }
-        };
+        }
         Ok(())
     }
 }

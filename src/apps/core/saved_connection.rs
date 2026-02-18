@@ -83,91 +83,36 @@ impl App {
     /// let _ = app.handle_saved();
     /// ```
     pub fn handle_saved(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('q'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (event::KeyCode::Char('q'), _) | (event::KeyCode::Esc, _) => {
                     self.close_saved_list();
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Esc,
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
-                    self.close_saved_list();
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('c'),
-                    kind: event::KeyEventKind::Press,
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (event::KeyCode::Char('c'), event::KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('d'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
+                (event::KeyCode::Char('d'), _) => {
                     // this will evaluate to run the delete confirmation dialog from the core ui
                     self.flags.show_delete_confirmation = true;
                 }
-
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('j'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
+                (event::KeyCode::Char('j'), _) | (event::KeyCode::Down, _) => {
                     self.update_selected_saved_network(1);
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Down,
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
-                    self.update_selected_saved_network(1);
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('k'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
+                (event::KeyCode::Char('k'), _) | (event::KeyCode::Up, _) => {
                     self.update_selected_saved_network(-1);
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Up,
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
-                    self.update_selected_saved_network(-1);
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('h'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
+                (event::KeyCode::Char('h'), _) | (event::KeyCode::Char('?'), _) => {
                     self.flags.show_help = true;
                 }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('?'),
-                    kind: event::KeyEventKind::Press,
-                    ..
-                }) => {
-                    self.flags.show_help = true;
-                }
-                Event::Key(KeyEvent {
-                    code: event::KeyCode::Char('r'),
-                    kind: event::KeyEventKind::Press,
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (event::KeyCode::Char('r'), event::KeyModifiers::CONTROL) => {
                     self.saved_connection.fetch_saved_connections();
                 }
                 _ => {}
-            };
+            }
         }
         Ok(())
     }
