@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 
 - Added a flag to indicate whether the app is scanning the networks or not.
 - Changed the type of list that was send to the scan_networks function from main App `struct` to be `RwLock` wrapped type rather than Arc wrapped type.
-- Removed the redundent key press kind.
+- Removed the redundant key press kind.
 
 ### Changed
 
