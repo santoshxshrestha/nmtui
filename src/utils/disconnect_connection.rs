@@ -1,4 +1,4 @@
-use crate::{apps::handlers::status::Status, WifiNetwork};
+use crate::{WifiNetwork, apps::handlers::status::Status};
 use std::{
     process::{Command, ExitStatus},
     sync::{Arc, RwLock},

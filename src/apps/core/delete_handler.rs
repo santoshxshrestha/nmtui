@@ -26,61 +26,27 @@ impl App {
     /// // let _ = app.handle_delete_confirmation();
     /// ```
     pub fn handle_delete_confirmation(&mut self) -> io::Result<()> {
-        if poll(Duration::from_micros(1))? {
-            match event::read()? {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Enter,
-                    ..
-                }) => {
+        if poll(Duration::from_micros(1))?
+            && let Event::Key(KeyEvent {
+                code, modifiers, ..
+            }) = event::read()?
+        {
+            match (code, modifiers) {
+                (KeyCode::Enter, _) | (KeyCode::Char('Y'), _) | (KeyCode::Char('y'), _) => {
                     self.delete_connection();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('Y'),
-                    ..
-                }) => {
-                    self.delete_connection();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('y'),
-                    ..
-                }) => {
-                    self.delete_connection();
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('N'),
-                    ..
-                }) => {
+                (KeyCode::Char('N'), _)
+                | (KeyCode::Char('n'), _)
+                | (KeyCode::Esc, _)
+                | (KeyCode::Char('q'), _) => {
                     self.flags.show_delete_confirmation = false;
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('n'),
-                    ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-
-                    modifiers: event::KeyModifiers::CONTROL,
-                    ..
-                }) => {
+                (KeyCode::Char('c'), event::KeyModifiers::CONTROL) => {
                     self.exit();
                 }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Esc, ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char('q'),
-                    ..
-                }) => {
-                    self.flags.show_delete_confirmation = false;
-                }
-
                 _ => {}
             }
-        };
+        }
         Ok(())
     }
     /// Delete the currently selected connection and refresh the network list.
